@@ -1,0 +1,63 @@
+Hareket
+    Kalemi indir
+    Kalemi kaldır
+    10 adım git
+    15 derece sağa dön
+    15 derece sola dön
+    rastgele konuma git
+    x y konumuna git
+    90 yönüne dön
+    x konumunu 10 değiştir
+    y konumunu 10 değiştir
+    x konumunu 0 yap
+    y konumunu 0 yap
+    kenara geldiysen sek
+    x konumu
+    y konumu
+
+Olaylar
+    Yeşil bayrak tıklanınca
+    Tuşa basılınca
+    Haber alındığında
+    haber sal
+
+Döngüler
+    10 defa tekrarla
+    sürekli tekrarla
+    olana kadar tekrarla
+
+Kontrol
+    eğer ise
+    eğer ise değilse
+    durdur
+
+Algılama
+    Kalem yazıyor
+    zamanlayıcı
+    zamanlayıcıyı sıfırla
+    saat
+    dakika
+    saniye
+Operatörler
+    +
+    *
+    -
+    /
+    1 ile 10 arasında bir sayı seç
+    büyüktür
+    küçüktür
+    eşit
+    ve
+    veya
+    mod
+    yuvarla
+    mutlak değer
+Değişkenler
+    değişken oluştur
+    değişkenin değerini 0 yap
+    değişkenin değerini 10 değiştir
+    Liste oluştur
+    Liseye eleman ekle
+    Listeden 1. elemanı sil
+    Listeyi temizle
+
