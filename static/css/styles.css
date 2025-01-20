@@ -1,0 +1,22 @@
+.blocklyToolboxDiv {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+.blocklyTreeLabel {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#blocklyArea {
+    height: 80vh;
+    margin-top: 20px;
+}
+
+#blocklyDiv {
+    height: 100%;
+    width: 100%;
+}
+
+#outputCanvas {
+    border: 1px solid #d3d3d3;
+}
