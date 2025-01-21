@@ -124,7 +124,7 @@ function drawCursor() {
 
     // İmleci merkeze taşı ve döndür
     ctx.translate(penPosition.x, penPosition.y);
-    ctx.rotate(-direction * Math.PI / 180);
+    ctx.rotate(direction * Math.PI / 180);
 
     // Ok başını çiz
     ctx.beginPath();
@@ -216,7 +216,6 @@ function gotoRandom() {
 }
 
 function setDirection(angle) {
-    console.log('setDirection called with angle:', angle);
     direction = -angle;
     updateCanvas();
 }
@@ -262,7 +261,7 @@ function setY(y) {
 }
 
 // Blok çalıştırma fonksiyonu
-function executeBlock(block) {
+async function executeBlock(block) {
     if (!block) return;
     
     switch (block.type) {
@@ -394,7 +393,7 @@ function executeBlock(block) {
                 var numberBlock = input.connection.targetBlock();
                 if (numberBlock.type === 'math_number') {
                     var times = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    repeat_times(times, block.id);
+                    await repeat_times(times, block.id);
                 } else {
                     console.warn("Bağlı blok math_number değil:", numberBlock.type);
                 }
@@ -402,50 +401,119 @@ function executeBlock(block) {
                 console.warn("TIMES girişine bağlı blok bulunamadı.");
             }
             break;
+            case 'wait_seconds':
+                var input = block.getInput('SECONDS');
+                if (input && input.connection && input.connection.targetBlock()) {
+                    var numberBlock = input.connection.targetBlock();
+                    if (numberBlock.type === 'math_number') {
+                        var seconds = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
+                        await wait_seconds(seconds);
+                    }
+                }
+                break;
             
+        case 'forever':
+            await forever_loop(block.id);
+            break;
+
+        case 'if':
+            var condition = false;
+            var conditionBlock = block.getInputTargetBlock('CONDITION');
+            if (conditionBlock) {
+                switch (conditionBlock.type) {
+                    case 'logic_boolean':
+                        condition = conditionBlock.getFieldValue('BOOL') === 'TRUE';
+                        break;
+                    case 'comparison_block':
+                        condition = await evaluateComparison(conditionBlock);
+                        break;
+                    case 'logic_and':
+                    case 'logic_or':
+                        condition = await evaluateLogicOperation(conditionBlock);
+                        break;
+                    default:
+                        console.warn('Desteklenmeyen koşul bloğu:', conditionBlock.type);
+                }
+            }
+            
+            if (condition) {
+                var childBlock = block.getInputTargetBlock('DO');
+                while (childBlock) {
+                    await executeBlock(childBlock);
+                    childBlock = childBlock.getNextBlock();
+                }
+            }
+            break;
+
         default:
             console.warn('Bilinmeyen blok tipi:', block.type);
     }
 }
 
-function repeat_times(times, blockId) {
-    // Convert times to number to ensure it's numeric
-    times = Number(times);
+// Karşılaştırma bloğu için yardımcı fonksiyon
+async function evaluateComparison(block) {
+    const operator = block.getFieldValue('OP');
+    const valueA = await executeBlock(block.getInputTargetBlock('A'));
+    const valueB = await executeBlock(block.getInputTargetBlock('B'));
     
-    // Validate input
-    if (isNaN(times) || times < 0) {
-        console.error('Invalid number of repetitions');
-        return;
+    switch (operator) {
+        case 'EQ':
+            return valueA == valueB;
+        case 'NEQ':
+            return valueA != valueB;
+        case 'LT':
+            return valueA < valueB;
+        case 'LTE':
+            return valueA <= valueB;
+        case 'GT':
+            return valueA > valueB;
+        case 'GTE':
+            return valueA >= valueB;
+        default:
+            return false;
     }
+}
 
-    // Get the current repeat block by ID
-    var blocks = workspace.getAllBlocks(true);
-    var repeatBlock = blocks.find(block => block.id === blockId);
-    
-    if (repeatBlock) {
-        console.log('Found repeat block with ID:', blockId);
-        // Get the statement input that contains child blocks
-        var statementInput = repeatBlock.getInput('DO');
-        if (statementInput && statementInput.connection && statementInput.connection.targetBlock()) {
-            // Execute the sequence of blocks 'times' number of times
-            for (let i = 0; i < times; i++) {
-                console.log(`Iteration ${i + 1} of ${times}`);
-                
-                // Get the first child block
-                var childBlock = statementInput.connection.targetBlock();
-                
-                // Execute each child block
-                while (childBlock) {
-                    console.log('Executing block:', childBlock.type);
-                    executeBlock(childBlock);
-                    childBlock = childBlock.getNextBlock();
-                }
+// Tekrar bloğu için yardımcı fonksiyon
+async function repeat_times(times, blockId) {
+    if (times <= 0) return;
+
+    var block = workspace.getBlockById(blockId);
+    if (block) {
+        var childBlock = block.getInputTargetBlock('DO');
+        
+        for (let i = 0; i < times; i++) {
+            let currentBlock = childBlock;
+            
+            // Execute each child block
+            while (currentBlock) {
+                await executeBlock(currentBlock);
             }
-        } else {
-            console.log('No child blocks found in the repeat block');
+            
         }
-    } else {
-        console.log('Repeat block not found with ID:', blockId);
+    }
+}
+
+// Sonsuz döngü bloğu için yardımcı fonksiyon
+async function forever_loop(blockId) {
+    var block = workspace.getBlockById(blockId);
+    if (block) {
+        var childBlock = block.getInputTargetBlock('DO');
+        
+        // Sonsuz döngü
+        while (true) {
+            let currentBlock = childBlock;
+            
+            // İçerideki her bloğu çalıştır
+            while (currentBlock) {
+                await executeBlock(currentBlock);
+                currentBlock = currentBlock.getNextBlock();
+            }
+            
+            // Döngünün her iterasyonunda küçük bir bekleme ekle
+            // Bu, tarayıcının donmasını önler
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
     }
 }
 
@@ -465,8 +533,35 @@ function toCartesianCoords(canvasX, canvasY) {
     };
 }
 
+// Belirtilen süre kadar bekler (milisaniye cinsinden)
+function wait_seconds(seconds) {
+    return new Promise(resolve => {
+        setTimeout(resolve, seconds * 1000);
+    });
+}
+
 // Sayfa yüklendiğinde canvas'ı başlat
 document.addEventListener('DOMContentLoaded', function () {
     initCanvas();
     console.log('Canvas initialized');
+
+    // Mouse koordinatlarını takip et
+    canvas.addEventListener('mousemove', function(event) {
+        const rect = canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+        
+        // Canvas koordinatlarını Kartezyen koordinatlara çevir
+        const coords = toCartesianCoords(canvasX, canvasY);
+        
+        // Koordinatları status bar'da göster
+        const coordsElement = document.getElementById('coordinates');
+        coordsElement.textContent = `x: ${Math.round(coords.x)}, y: ${Math.round(coords.y)}`;
+    });
+
+    // Mouse canvas dışına çıktığında koordinatları sıfırla
+    canvas.addEventListener('mouseout', function() {
+        const coordsElement = document.getElementById('coordinates');
+        coordsElement.textContent = 'x: 0, y: 0';
+    });
 });

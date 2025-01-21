@@ -354,14 +354,30 @@ Blockly.Blocks['broadcast'] = {
 
 Blockly.Blocks['wait_seconds'] = {
     init: function() {
+        // SECONDS giriş alanı
         this.appendValueInput("SECONDS")
             .setCheck("Number")
             .appendField("saniye bekle");
+
+        // SECONDS için varsayılan gölge blok ekleme
+        const shadowBlock = Blockly.utils.xml.createElement('shadow');
+        shadowBlock.setAttribute('type', 'math_number');
+
+        const fieldElement = Blockly.utils.xml.createElement('field');
+        fieldElement.setAttribute('name', 'NUM');
+        fieldElement.textContent = '1'; // Varsayılan değer: 1
+
+        shadowBlock.appendChild(fieldElement);
+        this.getInput("SECONDS").connection.setShadowDom(shadowBlock);
+
+        // Blok özellikleri
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(120);
+        this.setTooltip("Belirtilen saniye kadar bekler");
     }
 };
+
 
 Blockly.Blocks['repeat_times'] = {
     init: function() {
@@ -398,9 +414,12 @@ Blockly.Blocks['forever'] = {
         this.appendDummyInput()
             .appendField("sürekli tekrarla");
         this.appendStatementInput("DO")
-            .appendField("yap");
+            .setCheck(null);
         this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
         this.setColour(120);
+        this.setTooltip("Bu blok içindeki işlemleri sürekli tekrar eder");
+        this.setHelpUrl("");
     }
 };
 
@@ -410,10 +429,12 @@ Blockly.Blocks['if'] = {
             .setCheck("Boolean")
             .appendField("eğer");
         this.appendStatementInput("DO")
-            .appendField("ise");
+            .setCheck(null);
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
-        this.setColour(120);
+        this.setColour(210);
+        this.setTooltip("Eğer koşul doğru ise içindeki bloğu çalıştırır");
+        this.setHelpUrl("");
     }
 };
 

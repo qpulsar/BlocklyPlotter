@@ -47,6 +47,9 @@
                         <canvas id="outputCanvas" width="600" height="600"></canvas>
                     </div>
                 </div>
+                <div class="plotter-image mt-3 text-center">
+                    <img src="{% static 'images/plotter.jpeg' %}" alt="Plotter" class="img-fluid" style="max-width: 100%; height: auto;">
+                </div>
             </div>
         </div>
     </div>
@@ -124,6 +127,10 @@
         <block type="text_join"></block>
     </category>
 </xml>
+
+<div id="statusBar" class="fixed-bottom bg-dark text-light p-2">
+    Koordinatlar: <span id="coordinates">x: 0, y: 0</span>
+</div>
 
 <!-- Application Scripts -->
 <script src="{% static 'js/blockly-config.js' %}"></script>

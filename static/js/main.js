@@ -40,7 +40,7 @@ function onResize() {
 }
 
 // Run button click handler
-document.getElementById('runButton').addEventListener('click', function () {
+document.getElementById('runButton').addEventListener('click', async function () {
     // Workspace'deki blokları al
     var blocks = workspace.getAllBlocks(true);
 
@@ -55,7 +55,7 @@ document.getElementById('runButton').addEventListener('click', function () {
         // Blokları sırayla işle
         var currentBlock = startBlock.getNextBlock();
         while (currentBlock) {
-            executeBlock(currentBlock);
+            await executeBlock(currentBlock);
             currentBlock = currentBlock.getNextBlock();
         }
     }

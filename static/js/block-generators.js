@@ -91,7 +91,7 @@ Blockly.JavaScript['broadcast'] = function(block) {
 
 Blockly.JavaScript['wait_seconds'] = function(block) {
     var seconds = Blockly.JavaScript.valueToCode(block, 'SECONDS', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return 'await sleep(' + seconds + ');\n';
+    return `await new Promise(resolve => setTimeout(resolve, ${seconds} * 1000));\n`;
 };
 
 Blockly.JavaScript['repeat_times'] = function(block) {
