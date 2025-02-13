@@ -169,6 +169,9 @@ function updateCanvas() {
         ctx.setLineDash([]); 
     });
     
+    // Değişkenleri çiz
+    drawVariables();
+    
     // İmleci çiz
     drawCursor();
 }
@@ -463,6 +466,39 @@ function toCartesianCoords(canvasX, canvasY) {
         x: canvasX - canvas.width / 2,
         y: canvas.height / 2 - canvasY
     };
+}
+
+// Canvas üzerinde değişkenleri gösterme fonksiyonu
+const variableDisplay = new Map();
+const VARIABLE_FONT = '16px Arial';
+const VARIABLE_COLOR = '#2ecc71'; // Yeşil renk
+
+function showVariableOnCanvas(varName, value) {
+    if (!ctx) return;
+    
+    // Değeri güncelle veya yeni ekle
+    variableDisplay.set(varName, value);
+    
+    // Canvas'ı güncelle
+    updateCanvas();
+}
+
+function drawVariables() {
+    if (!ctx) return;
+    
+    ctx.save();
+    ctx.font = VARIABLE_FONT;
+    ctx.fillStyle = VARIABLE_COLOR;
+    ctx.textAlign = 'left';
+    
+    // Değişkenleri canvas'ın sol üst köşesine yaz
+    let yOffset = 30;
+    variableDisplay.forEach((value, varName) => {
+        ctx.fillText(`${varName} = ${value}`, 10, yOffset);
+        yOffset += 25;
+    });
+    
+    ctx.restore();
 }
 
 // Sayfa yüklendiğinde canvas'ı başlat

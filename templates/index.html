@@ -25,9 +25,16 @@
     <link rel="shortcut icon" href='{% static "images/favicon.ico"%}' type="image/x-icon" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-        <a class="navbar-brand" href="#">Blockly Plotter</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">BlocklyPlotter</a>
+        <div class="d-flex align-items-center" id="auth-section">
+            <div id="user-info" class="me-3" style="display: none;">
+                <span id="username-display"></span>
+            </div>
+            <button id="login-btn" class="btn btn-outline-primary me-2">Giriş Yap</button>
+            <button id="signup-btn" class="btn btn-primary">Kayıt Ol</button>
+        </div>
         <div class="d-flex">
             <button id="saveButton" class="btn btn-light me-2">Blokları Kaydet</button>
             <button id="runButton" class="btn btn-success">Çalıştır</button>
@@ -127,8 +134,15 @@
     </category>
 </xml>
 
-<script src="{% static 'js/blockly-config.js' %}"></script>
+<script src="{% static 'js/blocks/movement-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/control-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/math-logic-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/data-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/event-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/time-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/block-generators.js' %}"></script>
 <script src="{% static 'js/canvas-operations.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/auth.js' %}"></script>
 </body>
 </html>
