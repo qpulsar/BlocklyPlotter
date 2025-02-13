@@ -1,4 +1,6 @@
 // Workspace'i oluştur
+var blocklyArea = document.getElementById('blocklyArea');
+var blocklyDiv = document.getElementById('blocklyDiv');
 var workspace = Blockly.inject('blocklyDiv', {
     toolbox: document.getElementById('toolbox').outerHTML,
     zoom: {
@@ -17,35 +19,30 @@ var workspace = Blockly.inject('blocklyDiv', {
     }
 });
 
-// Save button click handler
-document.getElementById('saveButton').addEventListener('click', function () {
-    var workspace = Blockly.getMainWorkspace();
-    var xml = Blockly.Xml.workspaceToDom(workspace);
-    var xmlText = Blockly.Xml.domToText(xml);
-    localStorage.setItem('blocklyWorkspace', xmlText);
-});
+// Workspace boyutunu ayarla
+function onResize() {
+    // Compute the absolute coordinates and dimensions of blocklyArea.
+    var element = blocklyArea;
+    var x = 0;
+    var y = 0;
+    do {
+        x += element.offsetLeft;
+        y += element.offsetTop;
+        element = element.offsetParent;
+    } while (element);
+    
+    // Position blocklyDiv over blocklyArea.
+    blocklyDiv.style.left = x + 'px';
+    blocklyDiv.style.top = y + 'px';
+    blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+    blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+    Blockly.svgResize(workspace);
+}
 
 // Run button click handler
-document.getElementById('runButton').addEventListener('click', function () {
-    // Workspace'deki blokları konsola listele
+document.getElementById('runButton').addEventListener('click', async function () {
+    // Workspace'deki blokları al
     var blocks = workspace.getAllBlocks(true);
-
-
-    /*    console.log("Workspace'deki bloklar:");
-       blocks.forEach(function (block) {
-           console.log("Blok tipi:", block.type);
-           console.log("Blok ID:", block.id);
-           // Blok içindeki değerleri göster
-           var fields = block.inputList[0] ? block.inputList[0].fieldRow : [];
-           fields.forEach(function (field) {
-               if (field.value_) {
-                   console.log("Değer:", field.value_);
-               }
-           });
-           console.log("-----------------");
-       });
-    */
-
 
     // Canvas'ı hazırla
     clearCanvas();
@@ -58,18 +55,22 @@ document.getElementById('runButton').addEventListener('click', function () {
         // Blokları sırayla işle
         var currentBlock = startBlock.getNextBlock();
         while (currentBlock) {
-            executeBlock(currentBlock);
+            await executeBlock(currentBlock);
             currentBlock = currentBlock.getNextBlock();
         }
     }
 });
 
-// Sayfa yüklendiğinde canvas'ı başlat
+// Sayfa yüklendiğinde canvas'ı ve workspace'i başlat
 window.addEventListener('load', function () {
-    //console.log('Sayfa yüklendi, canvas başlatılıyor...');
     initCanvas();
     // Kalemin başlangıç durumu
     penDown = false;
+
+    // Workspace'in boyutunu ayarla
+    onResize();
+    // Pencere boyutu değiştiğinde workspace'i yeniden boyutlandır
+    window.addEventListener('resize', onResize);
 
     // Workspace'e varsayılan blokları ekle
     var defaultBlocks = `
@@ -105,42 +106,6 @@ window.addEventListener('load', function () {
                             <field name="NUM">100</field>
                           </shadow>
                         </value>
-                        <next>
-                          <block type="turn_right">
-                            <value name="ANGLE">
-                              <shadow type="math_number">
-                                <field name="NUM">60</field>
-                              </shadow>
-                            </value>
-                            <next>
-                              <block type="move_steps">
-                                <value name="STEPS">
-                                  <shadow type="math_number">
-                                    <field name="NUM">50</field>
-                                  </shadow>
-                                </value>
-                                <next>
-                                  <block type="turn_right">
-                                    <value name="ANGLE">
-                                      <shadow type="math_number">
-                                        <field name="NUM">45</field>
-                                      </shadow>
-                                    </value>
-                                    <next>
-                                      <block type="move_steps">
-                                        <value name="STEPS">
-                                          <shadow type="math_number">
-                                            <field name="NUM">50</field>
-                                          </shadow>
-                                        </value>
-                                      </block>
-                                    </next>
-                                  </block>
-                                </next>
-                              </block>
-                            </next>
-                          </block>
-                        </next>
                       </block>
                     </next>
                   </block>
@@ -153,8 +118,8 @@ window.addEventListener('load', function () {
     </next>
   </block>
 </xml>`;
+
     var parser = new DOMParser();
     var xmlDoc = parser.parseFromString(defaultBlocks, "text/xml");
     Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
-
 });
