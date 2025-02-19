@@ -2,6 +2,12 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import json
+import os
+from .utils import (
+    handle_json_response,
+    get_blocks_file_path,
+    DEFAULT_WORKSPACE
+)
 
 
 def index(request):
@@ -10,47 +16,40 @@ def index(request):
 
 @csrf_exempt
 def save_workspace(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            blocks_xml = data.get('blocks')
-            if not blocks_xml:
-                return JsonResponse({'success': False, 'error': 'Blok verisi bulunamadı!'}, status=400)
-            
-            # saved klasörünü oluştur (eğer yoksa)
-            import os
-            saved_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'saved')
-            os.makedirs(saved_dir, exist_ok=True)
-            
-            # blocks.xml dosyasına kaydet
-            blocks_file = os.path.join(saved_dir, 'blocks.xml')
-            with open(blocks_file, 'w', encoding='utf-8') as f:
-                f.write(blocks_xml)
-            
-            return JsonResponse({'success': True})
-        except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'error': 'Geçersiz JSON verisi!'}, status=400)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Bir hata oluştu: {str(e)}'}, status=500)
-    return JsonResponse({'success': False, 'error': 'Geçersiz istek metodu!'}, status=405)
+    if request.method != 'POST':
+        return handle_json_response(success=False, error='Geçersiz istek metodu!', status=405)
+    
+    try:
+        data = json.loads(request.body)
+        blocks_xml = data.get('blocks')
+        if not blocks_xml:
+            return handle_json_response(success=False, error='Blok verisi bulunamadı!', status=400)
+        
+        with open(get_blocks_file_path(), 'w', encoding='utf-8') as f:
+            f.write(blocks_xml)
+        
+        return handle_json_response()
+    except json.JSONDecodeError:
+        return handle_json_response(success=False, error='Geçersiz JSON verisi!', status=400)
+    except Exception as e:
+        return handle_json_response(success=False, error=f'Bir hata oluştu: {str(e)}', status=500)
 
 
 @csrf_exempt
 def get_workspace(request):
-    if request.method == 'GET':
-        try:
-            import os
-            blocks_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'saved', 'blocks.xml')
+    if request.method != 'GET':
+        return handle_json_response(success=False, error='Geçersiz istek metodu!', status=405)
+    
+    try:
+        blocks_file = get_blocks_file_path()
+        
+        if os.path.exists(blocks_file):
+            with open(blocks_file, 'r', encoding='utf-8') as f:
+                blocks_xml = f.read()
+        else:
+            blocks_xml = DEFAULT_WORKSPACE
             
-            if os.path.exists(blocks_file):
-                with open(blocks_file, 'r', encoding='utf-8') as f:
-                    blocks_xml = f.read()
-                return JsonResponse({'success': True, 'blocks': blocks_xml})
-            else:
-                # Eğer dosya yoksa boş bir workspace döndür
-                default_workspace = '<xml xmlns="https://developers.google.com/blockly/xml"></xml>'
-                return JsonResponse({'success': True, 'blocks': default_workspace})
+        return handle_json_response(data={'blocks': blocks_xml})
                 
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': f'Bir hata oluştu: {str(e)}'}, status=500)
-    return JsonResponse({'success': False, 'error': 'Geçersiz istek metodu!'}, status=405)
+    except Exception as e:
+        return handle_json_response(success=False, error=f'Bir hata oluştu: {str(e)}', status=500)

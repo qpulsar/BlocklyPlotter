@@ -1120,3 +1120,66 @@ Blockly.JavaScript['comparison_block'] = function(block) {
 
   return [code, Blockly.JavaScript.ORDER_RELATIONAL];
 };
+
+// Blockly temel yapılandırması
+const blocklyConfig = {
+    toolbox: document.getElementById('toolbox'),
+    collapse: true,
+    comments: true,
+    disable: true,
+    maxBlocks: Infinity,
+    trashcan: true,
+    horizontalLayout: false,
+    toolboxPosition: 'start',
+    css: true,
+    media: 'https://blockly-demo.appspot.com/static/media/',
+    rtl: false,
+    scrollbars: true,
+    sounds: true,
+    oneBasedIndex: true,
+    zoom: {
+        controls: true,
+        wheel: false,
+        startScale: 1,
+        maxScale: 3,
+        minScale: 0.3,
+        scaleSpeed: 1.2
+    }
+};
+
+// Blockly'yi başlat
+document.addEventListener('DOMContentLoaded', () => {
+    //const workspace = Blockly.inject('blocklyDiv', blocklyConfig);
+    
+    // Çalışma alanını ayarla
+    workspace.addChangeListener((event) => {
+        if (event.type === Blockly.Events.BLOCK_CREATE ||
+            event.type === Blockly.Events.BLOCK_DELETE ||
+            event.type === Blockly.Events.BLOCK_CHANGE ||
+            event.type === Blockly.Events.BLOCK_MOVE) {
+            // JavaScript kodunu oluştur
+            const code = Blockly.JavaScript.workspaceToCode(workspace);
+            // Kodu güncelle
+            if (typeof updateCode === 'function') {
+                updateCode(code);
+            }
+        }
+    });
+    
+    // Pencere yeniden boyutlandırıldığında Blockly'yi güncelle
+    window.addEventListener('resize', () => {
+        const blocklyArea = document.getElementById('blocklyArea');
+        const blocklyDiv = document.getElementById('blocklyDiv');
+        const position = {
+            x: blocklyArea.offsetLeft,
+            y: blocklyArea.offsetTop
+        };
+        
+        blocklyDiv.style.left = position.x + 'px';
+        blocklyDiv.style.top = position.y + 'px';
+        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
+        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+        
+        Blockly.svgResize(workspace);
+    });
+});

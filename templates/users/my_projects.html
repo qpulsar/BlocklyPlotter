@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Projelerim</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Proje Adı</th>
+                <th>Oluşturulma Tarihi</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.created_at|date:'d.m.Y H:i' }}</td>
+                <td>
+                    <a href="{% url 'project_detail' project.id %}" class="btn btn-sm btn-primary">Detay</a>
+                    <a href="{% url 'project_edit' project.id %}" class="btn btn-sm btn-warning">Düzenle</a>
+                    <a href="{% url 'project_delete' project.id %}" class="btn btn-sm btn-danger">Sil</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

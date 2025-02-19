@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
         <a class="navbar-brand d-flex align-items-center" href="#">
-            <img src="{% static 'images/plotterlogo.jpeg' %}" alt="Plotter Logo" class="me-2" style="height: 30px; width: auto;">
+            <img src="{% static 'images/plotterlogo.jpeg' %}" alt="Plotter Logo" class="me-2 navbar-logo">
             Blockly Plotter
         </a>
         
@@ -18,7 +18,7 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#" id="newFile"><i class="bi bi-file-earmark-plus"></i> Yeni</a></li>
-                        <li><a class="dropdown-item" href="#" id="saveFile"><i class="bi bi-save"></i> Şimdi Kaydet</a></li>
+                        <li><a class="dropdown-item" href="#" id="saveFile"><i class="bi bi-save"></i> Kaydet</a></li>
                         <li><a class="dropdown-item" href="#" id="saveAsCopy"><i class="bi bi-files"></i> Kopya Olarak Kaydet</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" id="loadFile"><i class="bi bi-folder2-open"></i> Bilgisayarından Yükle</a></li>
@@ -38,11 +38,111 @@
                         <li><a class="dropdown-item" href="#" id="paste"><i class="bi bi-clipboard"></i> Yapıştır</a></li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <input type="text" id="projectName" placeholder="Proje Adı" class="form-control ml-2">
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-info ml-2" id="projectInfoButton"><i class="bi bi-info-circle"></i></button>
+                </li>
             </ul>
+            <div class="navbar-nav ml-auto">
+                {% if request.user.is_authenticated %}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <img src="{% static 'images/avatar.png' %}" alt="Avatar" width="16" height="16" class="me-1">
+                            {{ request.user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person"></i> Profil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'my_projects' %}"><i class="bi bi-folder"></i> Projelerim</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Ayarlar</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Çıkış</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'signup' %}">Signup</a>
+                {% endif %}
+            </div>
             <div class="d-flex">
-                <button id="saveButton" class="btn btn-light me-2">Blokları Kaydet</button>
                 <button id="runButton" class="btn btn-success">Çalıştır</button>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+function generateUniqueFilename() {
+    let counter = 1;
+    let filename = 'isimsiz';
+    while (localStorage.getItem(filename + (counter > 1 ? ' ' + ('0' + counter).slice(-2) : ''))) {
+        counter++;
+    }
+    return filename + (counter > 1 ? ' ' + ('0' + counter).slice(-2) : '');
+}
+
+document.getElementById('newFile').addEventListener('click', function() {
+    // Clear blocks logic here (implementation depends on how blocks are stored)
+    // Example: workspace.clear();
+
+    // Generate unique filename
+    const newFilename = generateUniqueFilename();
+    document.getElementById('projectName').value = newFilename;
+    
+    // Optionally clear any saved state
+    localStorage.removeItem('currentProject');
+});
+
+document.getElementById('saveFile').addEventListener('click', function() {
+    fetch('/save_project/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+            'project_data': 'your_project_data_here'
+        })
+    }).then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+async function generateBlockThumbnail() {
+    // Implementation for generating block thumbnail
+    return await new Promise((resolve) => {
+        html2canvas(document.querySelector('.blocklyWorkspace')).then(canvas => {
+            canvas.toBlob(resolve, 'image/png');
+        });
+    });
+}
+
+async function generateCanvasThumbnail() {
+    // Implementation for generating canvas thumbnail
+    return await new Promise((resolve) => {
+        html2canvas(document.querySelector('#outputCanvas')).then(canvas => {
+            canvas.toBlob(resolve, 'image/png');
+        });
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
