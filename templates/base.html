@@ -1,0 +1,16 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    {% include 'partials/head.html' %}
+</head>
+<body>
+    {% include 'partials/navbar.html' %}
+    
+    <div class="container-fluid mt-0">
+        {% block content %}{% endblock %}
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

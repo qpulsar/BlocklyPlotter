@@ -1,0 +1,48 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{% static 'images/plotterlogo.jpeg' %}" alt="Plotter Logo" class="me-2" style="height: 30px; width: auto;">
+            Blockly Plotter
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        Dosya
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="newFile"><i class="bi bi-file-earmark-plus"></i> Yeni</a></li>
+                        <li><a class="dropdown-item" href="#" id="saveFile"><i class="bi bi-save"></i> Şimdi Kaydet</a></li>
+                        <li><a class="dropdown-item" href="#" id="saveAsCopy"><i class="bi bi-files"></i> Kopya Olarak Kaydet</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="loadFile"><i class="bi bi-folder2-open"></i> Bilgisayarından Yükle</a></li>
+                        <li><a class="dropdown-item" href="#" id="downloadFile"><i class="bi bi-download"></i> Bilgisayarına İndir</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                        Düzen
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" id="undo"><i class="bi bi-arrow-counterclockwise"></i> Geri Al</a></li>
+                        <li><a class="dropdown-item" href="#" id="redo"><i class="bi bi-arrow-clockwise"></i> İleri Al</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="cut"><i class="bi bi-scissors"></i> Kes</a></li>
+                        <li><a class="dropdown-item" href="#" id="copy"><i class="bi bi-files"></i> Kopyala</a></li>
+                        <li><a class="dropdown-item" href="#" id="paste"><i class="bi bi-clipboard"></i> Yapıştır</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <div class="d-flex">
+                <button id="saveButton" class="btn btn-light me-2">Blokları Kaydet</button>
+                <button id="runButton" class="btn btn-success">Çalıştır</button>
+            </div>
+        </div>
+    </div>
+</nav>
