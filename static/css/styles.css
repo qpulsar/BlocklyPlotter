@@ -195,3 +195,14 @@ body {
     position: relative !important;
     height: 100% !important;
 }
+
+/* Toolbox */
+.hidden-toolbox {
+    display: none;
+}
+
+/* Logo */
+.navbar-logo {
+    height: 30px;
+    width: auto;
+}

@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    {% csrf_token %}
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>
+                <span id="projectName" class="project-name" data-project-id="{{ project.id }}" ondblclick="makeEditable(this)">
+                    {{ project.name }}
+                </span>
+            </h2>
+            <p class="text-muted">
+                Oluşturulma: {{ project.created_at|date:'d.m.Y H:i' }} | 
+                Son Güncelleme: {{ project.updated_at|date:'d.m.Y H:i' }}
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'index' %}?project_id={{ project.id }}" class="btn btn-primary" onclick="storeProjectName('{{ project.name }}')">
+                <i class="fas fa-edit"></i> Düzenle
+            </a>
+            <button type="button" class="btn btn-success share-project" data-project-id="{{ project.id }}">
+                <i class="fas fa-share-alt"></i> Paylaş
+            </button>
+            <button type="button" class="btn btn-danger delete-project" data-project-id="{{ project.id }}" data-project-name="{{ project.name }}">
+                <i class="fas fa-trash"></i> Sil
+            </button>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Kod Blokları</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if project.block_thumbnail %}
+                    <img src="{{ project.block_thumbnail.url }}" class="img-fluid block-thumbnail" alt="Kod Blokları">
+                    {% elif project.block_thumbnail_base64 %}
+                    <img src="{{ project.block_thumbnail_base64 }}" class="img-fluid block-thumbnail" alt="Kod Blokları">
+                    {% else %}
+                    <div class="alert alert-info">
+                        Kod blokları önizlemesi mevcut değil.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Çıktı Ekranı</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if project.canvas_thumbnail %}
+                    <img src="{{ project.canvas_thumbnail.url }}" class="img-fluid" alt="Çıktı Ekranı">
+                    {% elif project.canvas_thumbnail_base64 %}
+                    <img src="{{ project.canvas_thumbnail_base64 }}" class="img-fluid" alt="Çıktı Ekranı">
+                    {% else %}
+                    <div class="alert alert-info">
+                        Çıktı ekranı önizlemesi mevcut değil.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if project.description %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Proje Açıklaması</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary edit-description-btn">
+                        <i class="fas fa-edit"></i> Düzenle
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="descriptionDisplay">
+                        <p class="card-text">{{ project.description }}</p>
+                    </div>
+                    <div id="descriptionEditor" class="d-none">
+                        <textarea id="descriptionTextarea" class="form-control mb-2" rows="5">{{ project.description }}</textarea>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2 cancel-description-btn">İptal</button>
+                            <button type="button" class="btn btn-primary save-description-btn">Kaydet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Proje Açıklaması</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary edit-description-btn">
+                        <i class="fas fa-plus"></i> Ekle
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="descriptionDisplay">
+                        <p class="card-text text-muted">Bu proje için henüz bir açıklama eklenmemiş.</p>
+                    </div>
+                    <div id="descriptionEditor" class="d-none">
+                        <textarea id="descriptionTextarea" class="form-control mb-2" rows="5"></textarea>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2 cancel-description-btn">İptal</button>
+                            <button type="button" class="btn btn-primary save-description-btn">Kaydet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Blok Verileri (XML)</h5>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3 rounded"><code>{{ project.block_data }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Silme Onay Modalı -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProjectModalLabel">Projeyi Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu projeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+                <p><strong id="projectNameToDelete"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form id="deleteProjectForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Paylaşım Modalı -->
+<div class="modal fade" id="shareProjectModal" tabindex="-1" aria-labelledby="shareProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareProjectModalLabel">Projeyi Paylaş</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="makePublic">
+                    <label class="form-check-label" for="makePublic">
+                        Bu projeyi herkese açık yap
+                    </label>
+                </div>
+                <div id="shareUrlContainer" class="d-none">
+                    <label for="shareUrl" class="form-label">Paylaşım Bağlantısı:</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="shareUrl" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copyShareUrl">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" id="updateShareSettings">Paylaşım Ayarlarını Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function storeProjectName(projectName) {
+        // Proje adını localStorage'a kaydet
+        localStorage.setItem('currentProjectName', projectName);
+    }
+
+    function makeEditable(element) {
+        const projectId = element.getAttribute('data-project-id');
+        const originalText = element.textContent;
+        element.innerHTML = `<input type="text" id="projectNameInput" value="${originalText}">`;
+        const projectNameInput = document.getElementById('projectNameInput');
+        projectNameInput.focus();
+        projectNameInput.select();
+
+        document.addEventListener('click', function(event) {
+            if (event.target.id !== 'projectNameInput') {
+                saveProjectName(projectId, originalText);
+            }
+        });
+
+        projectNameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveProjectName(projectId, originalText);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelEditing(element, originalText);
+            }
+        });
+    }
+
+    function saveProjectName(projectId, originalText) {
+        const projectNameInput = document.getElementById('projectNameInput');
+        const newProjectName = projectNameInput.value.trim();
+
+        if (newProjectName === '') {
+            alert('Proje adı boş olamaz!');
+            projectNameInput.focus();
+            return;
+        }
+
+        if (newProjectName === originalText) {
+            cancelEditing(document.getElementById('projectName'), originalText);
+            return;
+        }
+
+        fetch(`/blockly/project/${projectId}/update-name/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                name: newProjectName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('projectName').textContent = newProjectName;
+                // Sayfa başlığını da güncelle
+                document.title = newProjectName + ' - BlocklyPlotter';
+                // Silme butonundaki data-project-name özelliğini güncelle
+                const deleteButton = document.querySelector('.delete-project');
+                if (deleteButton) {
+                    deleteButton.setAttribute('data-project-name', newProjectName);
+                }
+            } else {
+                alert('Proje adı güncellenirken bir hata oluştu: ' + (data.error || 'Bilinmeyen hata'));
+                cancelEditing(document.getElementById('projectName'), originalText);
+            }
+        })
+        .catch(error => {
+            console.error('API hatası:', error);
+            alert('Proje adı güncellenirken bir hata oluştu.');
+            cancelEditing(document.getElementById('projectName'), originalText);
+        });
+    }
+
+    function cancelEditing(element, originalText) {
+        element.textContent = originalText;
+    }
+
+    // Sayfa yüklendiğinde çalışacak kodlar
+    document.addEventListener('DOMContentLoaded', function() {
+        // Silme modalı için
+        const deleteProjectModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
+        const deleteButtons = document.querySelectorAll('.delete-project');
+        const deleteForm = document.getElementById('deleteProjectForm');
+        const projectNameToDelete = document.getElementById('projectNameToDelete');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                const projectName = this.getAttribute('data-project-name');
+                
+                deleteForm.action = `/blockly/project/${projectId}/delete/`;
+                projectNameToDelete.textContent = projectName;
+                deleteProjectModal.show();
+            });
+        });
+        
+        // Paylaşım modalı için
+        const shareProjectModal = new bootstrap.Modal(document.getElementById('shareProjectModal'));
+        const shareButtons = document.querySelectorAll('.share-project');
+        const makePublicCheckbox = document.getElementById('makePublic');
+        const shareUrlContainer = document.getElementById('shareUrlContainer');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyShareUrlButton = document.getElementById('copyShareUrl');
+        const updateShareSettingsButton = document.getElementById('updateShareSettings');
+        
+        let currentProjectId = null;
+        
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                currentProjectId = this.getAttribute('data-project-id');
+                
+                // Projenin mevcut paylaşım durumunu kontrol et
+                fetch(`/blockly/project/${currentProjectId}/share-status/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        makePublicCheckbox.checked = data.is_public;
+                        if (data.is_public) {
+                            shareUrlContainer.classList.remove('d-none');
+                            shareUrl.value = `${window.location.origin}/blockly/shared/${currentProjectId}/`;
+                        } else {
+                            shareUrlContainer.classList.add('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                
+                shareProjectModal.show();
+            });
+        });
+        
+        makePublicCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                shareUrlContainer.classList.remove('d-none');
+                shareUrl.value = `${window.location.origin}/blockly/shared/${currentProjectId}/`;
+            } else {
+                shareUrlContainer.classList.add('d-none');
+            }
+        });
+        
+        copyShareUrlButton.addEventListener('click', function() {
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            // Kopyalandı bildirimi
+            this.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        });
+        
+        updateShareSettingsButton.addEventListener('click', function() {
+            fetch(`/blockly/project/${currentProjectId}/update-share-status/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    is_public: makePublicCheckbox.checked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    shareProjectModal.hide();
+                    alert('Paylaşım ayarları güncellendi!');
+                } else {
+                    alert('Paylaşım ayarları güncellenirken bir hata oluştu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Paylaşım ayarları güncellenirken bir hata oluştu.');
+            });
+        });
+
+        // Proje açıklaması düzenleme
+        const editDescriptionButtons = document.querySelectorAll('.edit-description-btn');
+        const descriptionDisplays = document.querySelectorAll('#descriptionDisplay');
+        const descriptionEditors = document.querySelectorAll('#descriptionEditor');
+        const descriptionTextareas = document.querySelectorAll('#descriptionTextarea');
+        const cancelDescriptionButtons = document.querySelectorAll('.cancel-description-btn');
+        const saveDescriptionButtons = document.querySelectorAll('.save-description-btn');
+
+        editDescriptionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const descriptionDisplay = this.parentNode.parentNode.querySelector('#descriptionDisplay');
+                const descriptionEditor = this.parentNode.parentNode.querySelector('#descriptionEditor');
+                descriptionDisplay.classList.add('d-none');
+                descriptionEditor.classList.remove('d-none');
+            });
+        });
+
+        cancelDescriptionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const descriptionDisplay = this.parentNode.parentNode.parentNode.querySelector('#descriptionDisplay');
+                const descriptionEditor = this.parentNode.parentNode.parentNode.querySelector('#descriptionEditor');
+                descriptionDisplay.classList.remove('d-none');
+                descriptionEditor.classList.add('d-none');
+            });
+        });
+
+        saveDescriptionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const projectId = {{ project.id }};
+                const descriptionTextarea = this.parentNode.parentNode.querySelector('#descriptionTextarea');
+                const newDescription = descriptionTextarea.value.trim();
+
+                fetch(`/blockly/project/${projectId}/update-description/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        description: newDescription
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const descriptionDisplay = this.parentNode.parentNode.parentNode.querySelector('#descriptionDisplay');
+                        descriptionDisplay.querySelector('p').textContent = newDescription;
+                        descriptionDisplay.classList.remove('d-none');
+                        this.parentNode.parentNode.classList.add('d-none');
+                    } else {
+                        alert('Proje açıklaması güncellenirken bir hata oluştu: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Proje açıklaması güncellenirken bir hata oluştu.');
+                });
+            });
+        });
+    });
+</script>
+<style>
+    .block-thumbnail {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+    
+    .project-name {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+    
+    .project-name:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+    
+    #projectNameInput {
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        width: 100%;
+    }
+</style>
+{% endblock %}

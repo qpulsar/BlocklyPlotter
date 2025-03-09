@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    {% csrf_token %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Projelerim</h2>
+        <a href="{% url 'index' %}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Yeni Proje
+        </a>
+    </div>
+    
+    {% if projects %}
+    <div class="row">
+        {% for project in projects %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <span class="project-name" data-project-id="{{ project.id }}" title="Düzenlemek için çift tıklayın">
+                            {{ project.name }}
+                        </span>
+                    </h5>
+                    <small class="text-muted">{{ project.created_at|date:'d.m.Y H:i' }}</small>
+                </div>
+                
+                {% if project.canvas_thumbnail %}
+                <a href="{% url 'project_detail' project.id %}">
+                    <img src="{{ project.canvas_thumbnail.url }}" class="card-img-top p-2" alt="Proje Önizleme" style="height: 200px; object-fit: contain;">
+                </a>
+                {% elif project.canvas_thumbnail_base64 %}
+                <a href="{% url 'project_detail' project.id %}">
+                    <img src="{{ project.canvas_thumbnail_base64 }}" class="card-img-top p-2" alt="Proje Önizleme" style="height: 200px; object-fit: contain;">
+                </a>
+                {% else %}
+                <a href="{% url 'project_detail' project.id %}" class="text-decoration-none">
+                    <div class="card-img-top d-flex justify-content-center align-items-center bg-light" style="height: 200px;">
+                        <span class="text-muted">Önizleme yok</span>
+                    </div>
+                </a>
+                {% endif %}
+                
+                <div class="card-body">
+                    <p class="card-text">
+                        {% if project.description %}
+                        {{ project.description|truncatechars:100 }}
+                        {% else %}
+                        <span class="text-muted">Açıklama yok</span>
+                        {% endif %}
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">Son güncelleme: {{ project.updated_at|date:'d.m.Y H:i' }}</small>
+                    </p>
+                </div>
+                
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'project_detail' project.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Görüntüle
+                        </a>
+                        <div>
+                            <button class="btn btn-info btn-sm share-project" data-project-id="{{ project.id }}" data-project-name="{{ project.name }}">
+                                <i class="fas fa-share-alt"></i> Paylaş
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-project" data-project-id="{{ project.id }}" data-project-name="{{ project.name }}">
+                                <i class="fas fa-trash"></i> Sil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p class="mb-0">Henüz hiç projeniz yok. <a href="{% url 'index' %}">Yeni bir proje oluşturmak için tıklayın.</a></p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Silme Onay Modalı -->
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProjectModalLabel">Projeyi Sil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bu projeyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+                <p><strong id="projectNameToDelete"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <form id="deleteProjectForm" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Paylaşım Modalı -->
+<div class="modal fade" id="shareProjectModal" tabindex="-1" aria-labelledby="shareProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareProjectModalLabel">Projeyi Paylaş</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="makePublic">
+                    <label class="form-check-label" for="makePublic">
+                        Bu projeyi herkese açık yap
+                    </label>
+                </div>
+                <div id="shareUrlContainer" class="d-none">
+                    <label for="shareUrl" class="form-label">Paylaşım Bağlantısı:</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="shareUrl" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copyShareUrl">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary" id="updateShareSettings">Paylaşım Ayarlarını Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Silme modalı için
+        const deleteProjectModal = new bootstrap.Modal(document.getElementById('deleteProjectModal'));
+        const deleteButtons = document.querySelectorAll('.delete-project');
+        const deleteForm = document.getElementById('deleteProjectForm');
+        const projectNameToDelete = document.getElementById('projectNameToDelete');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const projectId = this.getAttribute('data-project-id');
+                const projectName = this.getAttribute('data-project-name');
+                
+                deleteForm.action = `/blockly/project/${projectId}/delete/`;
+                projectNameToDelete.textContent = projectName;
+                deleteProjectModal.show();
+            });
+        });
+        
+        // Paylaşım modalı için
+        const shareProjectModal = new bootstrap.Modal(document.getElementById('shareProjectModal'));
+        const shareButtons = document.querySelectorAll('.share-project');
+        const makePublicCheckbox = document.getElementById('makePublic');
+        const shareUrlContainer = document.getElementById('shareUrlContainer');
+        const shareUrl = document.getElementById('shareUrl');
+        const copyShareUrlButton = document.getElementById('copyShareUrl');
+        const updateShareSettingsButton = document.getElementById('updateShareSettings');
+        
+        let currentProjectId = null;
+        
+        shareButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                currentProjectId = this.getAttribute('data-project-id');
+                
+                // Projenin mevcut paylaşım durumunu kontrol et
+                fetch(`/blockly/project/${currentProjectId}/share-status/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        makePublicCheckbox.checked = data.is_public;
+                        if (data.is_public) {
+                            shareUrlContainer.classList.remove('d-none');
+                            shareUrl.value = `${window.location.origin}/blockly/shared/${currentProjectId}/`;
+                        } else {
+                            shareUrlContainer.classList.add('d-none');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                
+                shareProjectModal.show();
+            });
+        });
+        
+        makePublicCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                shareUrlContainer.classList.remove('d-none');
+                shareUrl.value = `${window.location.origin}/blockly/shared/${currentProjectId}/`;
+            } else {
+                shareUrlContainer.classList.add('d-none');
+            }
+        });
+        
+        copyShareUrlButton.addEventListener('click', function() {
+            shareUrl.select();
+            document.execCommand('copy');
+            
+            // Kopyalandı bildirimi
+            this.innerHTML = '<i class="fas fa-check"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-copy"></i>';
+            }, 2000);
+        });
+        
+        updateShareSettingsButton.addEventListener('click', function() {
+            fetch(`/blockly/project/${currentProjectId}/update-share/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    is_public: makePublicCheckbox.checked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    shareProjectModal.hide();
+                    alert('Paylaşım ayarları güncellendi!');
+                } else {
+                    alert('Paylaşım ayarları güncellenirken bir hata oluştu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Paylaşım ayarları güncellenirken bir hata oluştu.');
+            });
+        });
+        
+        // Proje isimlerini çift tıklayınca düzenlenebilir yapma
+        const projectNameElements = document.querySelectorAll('.project-name');
+        
+        projectNameElements.forEach(element => {
+            // Çift tıklama işlemi
+            element.addEventListener('dblclick', function(event) {
+                event.stopPropagation(); // Tıklama olayının yayılmasını engelle
+                
+                const projectId = this.getAttribute('data-project-id');
+                const projectName = this.textContent.trim();
+                
+                const inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.value = projectName;
+                inputElement.classList.add('form-control');
+                
+                this.innerHTML = '';
+                this.appendChild(inputElement);
+                
+                inputElement.focus();
+                
+                inputElement.addEventListener('blur', function() {
+                    const newProjectName = this.value.trim();
+                    
+                    if (newProjectName === projectName) {
+                        element.textContent = projectName;
+                        return;
+                    }
+                    
+                    fetch(`/blockly/project/${projectId}/update-name/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({
+                            name: newProjectName
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            element.textContent = newProjectName;
+                        } else {
+                            alert('Proje ismi güncellenirken bir hata oluştu: ' + data.error);
+                            element.textContent = projectName;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Proje ismi güncellenirken bir hata oluştu.');
+                        element.textContent = projectName;
+                    });
+                });
+                
+                // Enter tuşuna basınca da kaydet
+                inputElement.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        this.blur();
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<style>
+    .project-name {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+        display: inline-block;
+    }
+    
+    .project-name:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .project-name input {
+        min-width: 150px;
+        padding: 2px 5px;
+    }
+    
+    .card-img-top {
+        height: 180px;
+        object-fit: contain;
+    }
+</style>
+{% endblock %}

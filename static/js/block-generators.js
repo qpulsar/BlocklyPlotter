@@ -69,8 +69,9 @@ Blockly.JavaScript['get_y'] = function(block) {
     return ['getY()', Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-// Kontrol blokları için JavaScript üreticileri
+// Olay blokları için JavaScript üreticileri
 Blockly.JavaScript['when_flag_clicked'] = function(block) {
+    // Başlangıç bloğu için basit bir kod döndür
     return '// Program başlangıcı\n';
 };
 
@@ -94,24 +95,33 @@ Blockly.JavaScript['wait_seconds'] = function(block) {
     return `await new Promise(resolve => setTimeout(resolve, ${seconds} * 1000));\n`;
 };
 
+// Kontrol blokları için JavaScript üreticileri
 Blockly.JavaScript['repeat_times'] = function(block) {
+    // 'Tekrarla X kez' bloğu için JavaScript kodu üretir
+    // For döngüsü oluşturur
     var times = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'for (let i = 0; i < ' + times + '; i++) {\n' + branch + '}\n';
 };
 
 Blockly.JavaScript['forever'] = function(block) {
+    // 'Sürekli' bloğu için JavaScript kodu üretir
+    // Sonsuz döngü oluşturur (while(true))
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'while (true) {\n' + branch + '}\n';
 };
 
 Blockly.JavaScript['if'] = function(block) {
+    // 'Eğer' koşul bloğu için JavaScript kodu üretir
+    // Koşullu ifade oluşturur (if statement)
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'if (' + condition + ') {\n' + branch + '}\n';
 };
 
 Blockly.JavaScript['if_else'] = function(block) {
+    // 'Eğer-Değilse' koşul bloğu için JavaScript kodu üretir
+    // Koşullu ifade oluşturur (if-else statement)
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch1 = Blockly.JavaScript.statementToCode(block, 'DO');
     var branch2 = Blockly.JavaScript.statementToCode(block, 'ELSE');
@@ -119,17 +129,23 @@ Blockly.JavaScript['if_else'] = function(block) {
 };
 
 Blockly.JavaScript['wait_until'] = function(block) {
+    // 'Bekle ... olana kadar' bloğu için JavaScript kodu üretir
+    // Koşul sağlanana kadar bekleyen bir döngü oluşturur (yield ile)
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     return 'while (!(' + condition + ')) {\n  yield;\n}\n';
 };
 
 Blockly.JavaScript['repeat_until'] = function(block) {
+    // 'Tekrarla ... olana kadar' bloğu için JavaScript kodu üretir
+    // Koşul sağlanana kadar tekrarlayan bir döngü oluşturur
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'while (!(' + condition + ')) {\n' + branch + '}\n';
 };
 
 Blockly.JavaScript['stop'] = function(block) {
+    // 'Durdur' bloğu için JavaScript kodu üretir
+    // Fonksiyondan çıkış sağlar (return statement)
     return 'return;\n';
 };
 
@@ -158,7 +174,7 @@ Blockly.JavaScript['current_second'] = function(block) {
     return ['new Date().getSeconds()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-// Matematik blokları için JavaScript üreticileri
+// Matematik ve mantık blokları için JavaScript üreticileri
 Blockly.JavaScript['math_add'] = function(block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
@@ -183,6 +199,53 @@ Blockly.JavaScript['math_divide'] = function(block) {
     return [a + ' / ' + b, Blockly.JavaScript.ORDER_DIVISION];
 };
 
+Blockly.JavaScript['random_int'] = function(block) {
+    return ['Math.floor(Math.random() * 100)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+Blockly.JavaScript['comparison_block'] = function(block) {
+    var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    var op = block.getFieldValue('OP');
+    
+    var code;
+    switch (op) {
+        case 'EQ':
+            code = a + ' === ' + b;
+            break;
+        case 'NEQ':
+            code = a + ' !== ' + b;
+            break;
+        case 'GT':
+            code = a + ' > ' + b;
+            break;
+        case 'GTE':
+            code = a + ' >= ' + b;
+            break;
+        case 'LT':
+            code = a + ' < ' + b;
+            break;
+        case 'LTE':
+            code = a + ' <= ' + b;
+            break;
+        default:
+            code = 'false';
+    }
+    return [code, Blockly.JavaScript.ORDER_RELATIONAL];
+};
+
+Blockly.JavaScript['logic_and'] = function(block) {
+    var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_LOGICAL_AND) || 'false';
+    var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_LOGICAL_AND) || 'false';
+    return [a + ' && ' + b, Blockly.JavaScript.ORDER_LOGICAL_AND];
+};
+
+Blockly.JavaScript['logic_or'] = function(block) {
+    var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_LOGICAL_OR) || 'false';
+    var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_LOGICAL_OR) || 'false';
+    return [a + ' || ' + b, Blockly.JavaScript.ORDER_LOGICAL_OR];
+};
+
 Blockly.JavaScript['math_modulo'] = function(block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
@@ -192,6 +255,25 @@ Blockly.JavaScript['math_modulo'] = function(block) {
 Blockly.JavaScript['math_round'] = function(block) {
     var number = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return ['Math.round(' + number + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+Blockly.JavaScript['math_abs'] = function(block) {
+    var number = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    return ['Math.abs(' + number + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+};
+
+Blockly.JavaScript['logic_null'] = function(block) {
+    return ['null', Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.JavaScript['logic_boolean'] = function(block) {
+    var code = (block.getFieldValue('BOOL') === 'TRUE') ? 'true' : 'false';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.JavaScript['math_number'] = function(block) {
+    var code = Number(block.getFieldValue('NUM'));
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['math_random_int'] = function(block) {

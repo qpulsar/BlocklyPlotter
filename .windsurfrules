@@ -56,16 +56,4 @@ Key Conventions
 
 Refer to Django documentation for best practices in views, models, forms, and security considerations.
 
-
-1. Benimle Türkçe konuş.
-2. D:\Projects\WebTemplates\AdminLTE-3.2.0 klasörünün içinde projenin templat'i var. ;Yeni bir görsel eklemek gerekince önce bu klasördeki örnek kullanılmları incele.
-3. Formlar django-crispy-forms kullanılarak oluşturulacaktır.
-4. biçimlendirmeyi django-bootstrap4 kullanılarak yapacaktır.
-5. ajax ile veri çekmek ve eklemek gerektiğinde ajax_view.py dosyası kullanacaktır.
-6. Modelleri değiştirme
-7. _data_table.html değiştirme
-8. delete_modal.js değiştirme
-9. _control_bar.html değiştirme
-10. delete-option.js değiştirme
-11. partial klasörünün içinde olan dosyalarla aynı işlevde kod yazma. Mevcut dosyaları kullan.
-12. components klasörünün içinde olan dosyalarla aynı işlevde kod yazma. Kullanılmayan dosyaları sil.
+Düzenlemeler sonrasında projeyi çalıştırmayı önerme.

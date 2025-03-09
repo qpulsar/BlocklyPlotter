@@ -24,6 +24,18 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Block definitions and generators -->
+<script src="{% static 'js/blocks/control-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/event-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/math-logic-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/movement-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/time-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/data-blocks.js' %}"></script>
+
+<!-- JavaScript generators -->
+<script src="{% static 'js/block-generators.js' %}"></script>
+
+<!-- Main application scripts -->
 <script src="{% static 'js/blockly-config.js' %}"></script>
 <script src="{% static 'js/canvas-operations.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
