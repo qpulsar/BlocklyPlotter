@@ -1148,6 +1148,7 @@ const blocklyConfig = {
 };
 
 // Blockly'yi başlat
+
 document.addEventListener('DOMContentLoaded', () => {
     //const workspace = Blockly.inject('blocklyDiv', blocklyConfig);
     
@@ -1157,11 +1158,15 @@ document.addEventListener('DOMContentLoaded', () => {
             event.type === Blockly.Events.BLOCK_DELETE ||
             event.type === Blockly.Events.BLOCK_CHANGE ||
             event.type === Blockly.Events.BLOCK_MOVE) {
-            // JavaScript kodunu oluştur
-            const code = Blockly.JavaScript.workspaceToCode(workspace);
-            // Kodu güncelle
-            if (typeof updateCode === 'function') {
-                updateCode(code);
+            try {
+                // JavaScript kodunu oluştur
+                const code = Blockly.JavaScript.workspaceToCode(workspace);
+                // Kodu güncelle
+                if (typeof updateCode === 'function') {
+                    updateCode(code);
+                }
+            } catch (error) {
+                console.error('Kod oluşturma hatası:', error);
             }
         }
     });

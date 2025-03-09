@@ -261,8 +261,136 @@ function setY(y) {
     updateCanvas();
 }
 
+// Koşul bloğunu değerlendiren yardımcı fonksiyon
+function evaluateCondition(block) {
+    if (!block) {
+        console.warn('evaluateCondition: Blok boş');
+        return false;
+    }
+    
+    console.log('evaluateCondition: Blok tipi değerlendiriliyor:', block.type);
+    
+    switch (block.type) {
+        case 'comparison_block':
+            var opField = block.getFieldValue('OP');
+            var a = getValueFromBlock(block, 'A');
+            var b = getValueFromBlock(block, 'B');
+            
+            console.log('Karşılaştırma:', a, opField, b);
+            
+            switch (opField) {
+                case 'EQ': return a === b;
+                case 'NEQ': return a !== b;
+                case 'GT': return a > b;
+                case 'GTE': return a >= b;
+                case 'LT': return a < b;
+                case 'LTE': return a <= b;
+                default: return false;
+            }
+            
+        case 'logic_and':
+            var blockA = block.getInputTargetBlock('A');
+            var blockB = block.getInputTargetBlock('B');
+            var a = blockA ? evaluateCondition(blockA) : false;
+            var b = blockB ? evaluateCondition(blockB) : false;
+            console.log('logic_and:', a, '&&', b, '=', (a && b));
+            return a && b;
+            
+        case 'logic_or':
+            var blockA = block.getInputTargetBlock('A');
+            var blockB = block.getInputTargetBlock('B');
+            var a = blockA ? evaluateCondition(blockA) : false;
+            var b = blockB ? evaluateCondition(blockB) : false;
+            console.log('logic_or:', a, '||', b, '=', (a || b));
+            return a || b;
+            
+        case 'logic_boolean':
+            var value = block.getFieldValue('BOOL') === 'TRUE';
+            console.log('logic_boolean:', value);
+            return value;
+            
+        default:
+            // Diğer blok tipleri için değeri alıp boolean'a çevir
+            var value = getValueFromBlock(block);
+            console.log('Diğer blok tipi:', block.type, 'Değer:', value, 'Boolean:', Boolean(value));
+            return Boolean(value);
+    }
+}
+
+// Bloktan değer çıkaran yardımcı fonksiyon
+function getValueFromBlock(block, inputName) {
+    if (!block) return null;
+    
+    // Eğer bir giriş adı belirtilmişse, o girişi al
+    var targetBlock = inputName ? 
+        (block.getInput(inputName) ? block.getInput(inputName).connection.targetBlock() : null) : 
+        block;
+    
+    if (!targetBlock) return null;
+    
+    switch (targetBlock.type) {
+        case 'math_number':
+            return Number(targetBlock.getFieldValue('NUM'));
+            
+        case 'text':
+            return targetBlock.getFieldValue('TEXT');
+            
+        case 'logic_boolean':
+            return targetBlock.getFieldValue('BOOL') === 'TRUE';
+            
+        case 'math_add':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            return a + b;
+            
+        case 'math_subtract':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            return a - b;
+            
+        case 'math_multiply':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            return a * b;
+            
+        case 'math_divide':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            return b !== 0 ? a / b : 0;
+            
+        case 'math_modulo':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            return b !== 0 ? a % b : 0;
+            
+        case 'math_round':
+            var num = getValueFromBlock(targetBlock, 'NUM') || 0;
+            return Math.round(num);
+            
+        case 'math_abs':
+            var num = getValueFromBlock(targetBlock, 'NUM') || 0;
+            return Math.abs(num);
+            
+        case 'random_int':
+            return Math.floor(Math.random() * 100);
+            
+        case 'get_x':
+            return toCartesianCoords(penPosition.x, penPosition.y).x;
+            
+        case 'get_y':
+            return toCartesianCoords(penPosition.x, penPosition.y).y;
+            
+        case 'is_pen_down':
+            return penDown;
+            
+        default:
+            console.warn('Değer alınamadı, bilinmeyen blok tipi:', targetBlock.type);
+            return null;
+    }
+}
+
 // Blok çalıştırma fonksiyonu
-function executeBlock(block) {
+async function executeBlock(block) {
     if (!block) return;
     
     switch (block.type) {
@@ -394,7 +522,7 @@ function executeBlock(block) {
                 var numberBlock = input.connection.targetBlock();
                 if (numberBlock.type === 'math_number') {
                     var times = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    repeat_times(times, block.id);
+                    await repeat_times(times, block.id);
                 } else {
                     console.warn("Bağlı blok math_number değil:", numberBlock.type);
                 }
@@ -403,12 +531,155 @@ function executeBlock(block) {
             }
             break;
             
+        case 'forever':
+            // 'Sürekli' bloğu için işleme
+            var statementInput = block.getInput('DO');
+            if (statementInput && statementInput.connection && statementInput.connection.targetBlock()) {
+                // Sonsuz döngü - dikkatli kullanılmalı
+                var shouldContinue = true;
+                while (shouldContinue) {
+                    var childBlock = statementInput.connection.targetBlock();
+                    while (childBlock) {
+                        var result = await executeBlock(childBlock);
+                        // Eğer bir blok durdurma sinyali verirse döngüyü kır
+                        if (result === true) {
+                            shouldContinue = false;
+                            break;
+                        }
+                        childBlock = childBlock.getNextBlock();
+                    }
+                    
+                    // Güvenlik için kısa bir bekleme ekleyelim
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            }
+            break;
+            
+        case 'if':
+            // 'Eğer' koşul bloğu için işleme
+            console.log('if bloğu işleniyor...');
+            var conditionInput = block.getInput('CONDITION');
+            if (conditionInput && conditionInput.connection && conditionInput.connection.targetBlock()) {
+                // Koşul bloğunu değerlendir
+                var conditionBlock = conditionInput.connection.targetBlock();
+                console.log('Koşul bloğu tipi:', conditionBlock.type);
+                
+                try {
+                    var conditionValue = evaluateCondition(conditionBlock);
+                    console.log('Koşul değeri:', conditionValue);
+                    
+                    // Eğer koşul doğruysa, içindeki blokları çalıştır
+                    if (conditionValue) {
+                        console.log('Koşul doğru, içindeki bloklar çalıştırılıyor...');
+                        var doInput = block.getInput('DO');
+                        if (doInput && doInput.connection && doInput.connection.targetBlock()) {
+                            var statementBlock = doInput.connection.targetBlock();
+                            while (statementBlock) {
+                                console.log('Alt blok çalıştırılıyor:', statementBlock.type);
+                                await executeBlock(statementBlock);
+                                statementBlock = statementBlock.getNextBlock();
+                            }
+                        } else {
+                            console.log('DO girişinde blok bulunamadı');
+                        }
+                    } else {
+                        console.log('Koşul yanlış, içindeki bloklar atlanıyor...');
+                    }
+                } catch (error) {
+                    console.error('Koşul değerlendirme hatası:', error);
+                }
+            } else {
+                console.warn('CONDITION girişine bağlı blok bulunamadı.');
+            }
+            break;
+            
+        case 'if_else':
+            // 'Eğer-Değilse' koşul bloğu için işleme
+            console.log('if_else bloğu işleniyor...');
+            var conditionInput = block.getInput('CONDITION');
+            if (conditionInput && conditionInput.connection && conditionInput.connection.targetBlock()) {
+                // Koşul bloğunu değerlendir
+                var conditionBlock = conditionInput.connection.targetBlock();
+                console.log('Koşul bloğu tipi:', conditionBlock.type);
+                
+                try {
+                    var conditionValue = evaluateCondition(conditionBlock);
+                    console.log('Koşul değeri:', conditionValue);
+                    
+                    // Koşula göre ilgili blokları çalıştır
+                    if (conditionValue) {
+                        console.log('Koşul doğru, DO blokları çalıştırılıyor...');
+                        var doInput = block.getInput('DO');
+                        if (doInput && doInput.connection && doInput.connection.targetBlock()) {
+                            var statementBlock = doInput.connection.targetBlock();
+                            while (statementBlock) {
+                                console.log('DO alt bloğu çalıştırılıyor:', statementBlock.type);
+                                await executeBlock(statementBlock);
+                                statementBlock = statementBlock.getNextBlock();
+                            }
+                        } else {
+                            console.log('DO girişinde blok bulunamadı');
+                        }
+                    } else {
+                        console.log('Koşul yanlış, ELSE blokları çalıştırılıyor...');
+                        var elseInput = block.getInput('ELSE');
+                        if (elseInput && elseInput.connection && elseInput.connection.targetBlock()) {
+                            var elseBlock = elseInput.connection.targetBlock();
+                            while (elseBlock) {
+                                console.log('ELSE alt bloğu çalıştırılıyor:', elseBlock.type);
+                                await executeBlock(elseBlock);
+                                elseBlock = elseBlock.getNextBlock();
+                            }
+                        } else {
+                            console.log('ELSE girişinde blok bulunamadı');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Koşul değerlendirme hatası:', error);
+                }
+            } else {
+                console.warn('CONDITION girişine bağlı blok bulunamadı.');
+            }
+            break;
+            
+        case 'wait_until':
+            // 'Bekle ... olana kadar' bloğu için işleme
+            var conditionInput = block.getInput('CONDITION');
+            if (conditionInput && conditionInput.connection && conditionInput.connection.targetBlock()) {
+                var conditionBlock = conditionInput.connection.targetBlock();
+                // Koşul sağlanana kadar bekle
+                while (!evaluateCondition(conditionBlock)) {
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Kısa bir bekleme
+                }
+            }
+            break;
+            
+        case 'repeat_until':
+            // 'Tekrarla ... olana kadar' bloğu için işleme
+            var conditionInput = block.getInput('CONDITION');
+            if (conditionInput && conditionInput.connection && conditionInput.connection.targetBlock()) {
+                var conditionBlock = conditionInput.connection.targetBlock();
+                // Koşul sağlanana kadar içindeki blokları tekrarla
+                while (!evaluateCondition(conditionBlock)) {
+                    var statementBlock = block.getInput('DO').connection.targetBlock();
+                    while (statementBlock) {
+                        await executeBlock(statementBlock);
+                        statementBlock = statementBlock.getNextBlock();
+                    }
+                }
+            }
+            break;
+            
+        case 'stop':
+            // 'Durdur' bloğu için işleme - çalışmayı sonlandır
+            return true; // Çalışmayı durdurmak için true döndür
+            
         default:
             console.warn('Bilinmeyen blok tipi:', block.type);
     }
 }
 
-function repeat_times(times, blockId) {
+async function repeat_times(times, blockId) {
     // Convert times to number to ensure it's numeric
     times = Number(times);
     
@@ -437,7 +708,7 @@ function repeat_times(times, blockId) {
                 // Execute each child block
                 while (childBlock) {
                     console.log('Executing block:', childBlock.type);
-                    executeBlock(childBlock);
+                    await executeBlock(childBlock);
                     childBlock = childBlock.getNextBlock();
                 }
             }
