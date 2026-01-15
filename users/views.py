@@ -83,12 +83,27 @@ def my_projects(request):
     projects = BlocklyProject.objects.filter(user=request.user)
     return render(request, 'users/my_projects.html', {'projects': projects})
 
+@login_required
 @csrf_exempt
 def save_project(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        project_data = data.get('project_data')
-        project = BlocklyProject(project_data=project_data)
-        project.save()
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            block_data = data.get('block_data')
+
+            if not name or not block_data:
+                return JsonResponse({'status': 'error', 'message': 'Missing name or block_data'}, status=400)
+
+            project = BlocklyProject.objects.create(
+                user=request.user,
+                name=name,
+                block_data=block_data
+            )
+            return JsonResponse({'status': 'success', 'project_id': project.id})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)

@@ -10,11 +10,19 @@
     </div>
     <div class="col-md-6">
         <div class="card mt-3">
-            <div class="card-header">
-                Çıktı
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Çıktı</span>
+                <div>
+                    <button id="runButton" class="btn btn-success btn-sm">
+                        <i class="fas fa-play"></i> Çalıştır
+                    </button>
+                    <button id="clearButton" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i> Temizle
+                    </button>
+                </div>
             </div>
-            <div class="card-body">
-                <canvas id="outputCanvas" width="600" height="600"></canvas>
+            <div class="card-body text-center">
+                <canvas id="outputCanvas" width="600" height="600" class="border"></canvas>
             </div>
         </div>
     </div>
@@ -31,6 +39,10 @@
 <script src="{% static 'js/blocks/movement-blocks.js' %}"></script>
 <script src="{% static 'js/blocks/time-blocks.js' %}"></script>
 <script src="{% static 'js/blocks/data-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/shape-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/pen-settings-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/advanced-math-blocks.js' %}"></script>
+<script src="{% static 'js/blocks/physics-blocks.js' %}"></script>
 
 <!-- JavaScript generators -->
 <script src="{% static 'js/block-generators.js' %}"></script>
@@ -38,5 +50,8 @@
 <!-- Main application scripts -->
 <script src="{% static 'js/blockly-config.js' %}"></script>
 <script src="{% static 'js/canvas-operations.js' %}"></script>
+<script src="{% static 'js/canvas/shape-drawing-operations.js' %}"></script>
+<script src="{% static 'js/canvas/physics-drawing-operations.js' %}"></script>
+<script src="{% static 'js/variable-watcher.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}

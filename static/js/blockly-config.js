@@ -1,6 +1,6 @@
 // Blok tanımlamaları
 Blockly.Blocks['pen_down'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Kalemi indir");
         this.setPreviousStatement(true, null);
@@ -12,7 +12,7 @@ Blockly.Blocks['pen_down'] = {
 };
 
 Blockly.Blocks['pen_up'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Kalemi kaldır");
         this.setPreviousStatement(true, null);
@@ -24,7 +24,7 @@ Blockly.Blocks['pen_up'] = {
 };
 
 Blockly.Blocks['move_steps'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("STEPS")
             .setCheck("Number")
             .appendField("adım kadar ilerle");
@@ -50,7 +50,7 @@ Blockly.Blocks['move_steps'] = {
 
 
 Blockly.Blocks['turn_right'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("ANGLE")
             .setCheck("Number")
             .appendField("sağa dön");
@@ -75,7 +75,7 @@ Blockly.Blocks['turn_right'] = {
 
 
 Blockly.Blocks['turn_left'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("ANGLE")
             .setCheck("Number")
             .appendField("sola dön");
@@ -98,7 +98,7 @@ Blockly.Blocks['turn_left'] = {
     }
 };
 Blockly.Blocks['goto_random'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("rastgele konuma git");
         this.setPreviousStatement(true, null);
@@ -108,7 +108,7 @@ Blockly.Blocks['goto_random'] = {
 };
 
 Blockly.Blocks['goto_xy'] = {
-    init: function() {
+    init: function () {
         // X giriş alanı
         this.appendValueInput("X")
             .setCheck("Number")
@@ -149,7 +149,7 @@ Blockly.Blocks['goto_xy'] = {
 };
 
 Blockly.Blocks['set_direction'] = {
-    init: function() {
+    init: function () {
         // ANGLE giriş alanı
         this.appendValueInput("ANGLE")
             .setCheck("Number")
@@ -176,7 +176,7 @@ Blockly.Blocks['set_direction'] = {
 
 
 Blockly.Blocks['change_x'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("DX")
             .setCheck("Number")
             .appendField("x konumunu");
@@ -204,7 +204,7 @@ Blockly.Blocks['change_x'] = {
 
 
 Blockly.Blocks['change_y'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("DY")
             .setCheck("Number")
             .appendField("y konumunu");
@@ -232,7 +232,7 @@ Blockly.Blocks['change_y'] = {
 
 
 Blockly.Blocks['set_x'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("X")
             .setCheck("Number")
             .appendField("x konumunu");
@@ -259,7 +259,7 @@ Blockly.Blocks['set_x'] = {
 };
 
 Blockly.Blocks['set_y'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("Y")
             .setCheck("Number")
             .appendField("y konumunu");
@@ -286,7 +286,7 @@ Blockly.Blocks['set_y'] = {
 };
 
 Blockly.Blocks['bounce_on_edge'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("kenara geldiysen sek");
         this.setPreviousStatement(true, null);
@@ -296,7 +296,7 @@ Blockly.Blocks['bounce_on_edge'] = {
 };
 
 Blockly.Blocks['get_x'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("x konumu");
         this.setOutput(true, "Number");
@@ -305,7 +305,7 @@ Blockly.Blocks['get_x'] = {
 };
 
 Blockly.Blocks['get_y'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("y konumu");
         this.setOutput(true, "Number");
@@ -314,7 +314,7 @@ Blockly.Blocks['get_y'] = {
 };
 
 Blockly.Blocks['when_flag_clicked'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Yeşil bayrak tıklanınca");
         this.setNextStatement(true, null);
@@ -324,28 +324,37 @@ Blockly.Blocks['when_flag_clicked'] = {
 };
 
 Blockly.Blocks['when_key_pressed'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
-            .appendField("Tuşa basılınca");
+            .appendField("Tuşa basılınca")
+            .appendField(new Blockly.FieldDropdown([
+                ["boşluk (space)", "space"],
+                ["yukarı ok", "ArrowUp"],
+                ["aşağı ok", "ArrowDown"],
+                ["sol ok", "ArrowLeft"],
+                ["sağ ok", "ArrowRight"],
+                ["herhangi", "any"]
+            ]), "KEY");
         this.setNextStatement(true, null);
         this.setColour(60);
     }
 };
 
 Blockly.Blocks['when_message_received'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
-            .appendField("Haber alındığında");
+            .appendField("Haber alındığında")
+            .appendField(new Blockly.FieldTextInput("mesaj1"), "MESSAGE");
         this.setNextStatement(true, null);
         this.setColour(60);
     }
 };
 
 Blockly.Blocks['broadcast'] = {
-    init: function() {
-        this.appendValueInput("MESSAGE")
-            .setCheck("String")
-            .appendField("haber sal");
+    init: function () {
+        this.appendDummyInput()
+            .appendField("haber sal")
+            .appendField(new Blockly.FieldTextInput("mesaj1"), "MESSAGE");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(60);
@@ -353,18 +362,27 @@ Blockly.Blocks['broadcast'] = {
 };
 
 Blockly.Blocks['wait_seconds'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("SECONDS")
             .setCheck("Number")
             .appendField("saniye bekle");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(120);
+
+        // Gölge blok ekleme
+        const shadowBlock = Blockly.utils.xml.createElement('shadow');
+        shadowBlock.setAttribute('type', 'math_number');
+        const fieldElement = Blockly.utils.xml.createElement('field');
+        fieldElement.setAttribute('name', 'NUM');
+        fieldElement.textContent = '1';
+        shadowBlock.appendChild(fieldElement);
+        this.getInput('SECONDS').connection.setShadowDom(shadowBlock);
     }
 };
 
 Blockly.Blocks['repeat_times'] = {
-    init: function() {
+    init: function () {
         // TIMES giriş alanı
         this.appendValueInput("TIMES")
             .setCheck("Number")
@@ -394,7 +412,7 @@ Blockly.Blocks['repeat_times'] = {
 
 
 Blockly.Blocks['forever'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("sürekli tekrarla");
         this.appendStatementInput("DO")
@@ -405,7 +423,7 @@ Blockly.Blocks['forever'] = {
 };
 
 Blockly.Blocks['if'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("CONDITION")
             .setCheck("Boolean")
             .appendField("eğer");
@@ -418,7 +436,7 @@ Blockly.Blocks['if'] = {
 };
 
 Blockly.Blocks['if_else'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("CONDITION")
             .setCheck("Boolean")
             .appendField("eğer");
@@ -433,7 +451,7 @@ Blockly.Blocks['if_else'] = {
 };
 
 Blockly.Blocks['wait_until'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("CONDITION")
             .setCheck("Boolean")
             .appendField("olana kadar bekle");
@@ -444,7 +462,7 @@ Blockly.Blocks['wait_until'] = {
 };
 
 Blockly.Blocks['repeat_until'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("CONDITION")
             .setCheck("Boolean")
             .appendField("olana kadar tekrarla");
@@ -457,7 +475,7 @@ Blockly.Blocks['repeat_until'] = {
 };
 
 Blockly.Blocks['stop'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("durdur");
         this.setPreviousStatement(true, null);
@@ -466,7 +484,7 @@ Blockly.Blocks['stop'] = {
 };
 
 Blockly.Blocks['is_pen_down'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Kalem yazıyor");
         this.setOutput(true, "Boolean");
@@ -475,7 +493,7 @@ Blockly.Blocks['is_pen_down'] = {
 };
 
 Blockly.Blocks['timer'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("zamanlayıcı");
         this.setOutput(true, "Number");
@@ -484,7 +502,7 @@ Blockly.Blocks['timer'] = {
 };
 
 Blockly.Blocks['reset_timer'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("zamanlayıcıyı sıfırla");
         this.setPreviousStatement(true, null);
@@ -494,7 +512,7 @@ Blockly.Blocks['reset_timer'] = {
 };
 
 Blockly.Blocks['current_hour'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("saat");
         this.setOutput(true, "Number");
@@ -503,7 +521,7 @@ Blockly.Blocks['current_hour'] = {
 };
 
 Blockly.Blocks['current_minute'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("dakika");
         this.setOutput(true, "Number");
@@ -512,7 +530,7 @@ Blockly.Blocks['current_minute'] = {
 };
 
 Blockly.Blocks['current_second'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("saniye");
         this.setOutput(true, "Number");
@@ -521,7 +539,7 @@ Blockly.Blocks['current_second'] = {
 };
 
 Blockly.Blocks['math_add'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -533,7 +551,7 @@ Blockly.Blocks['math_add'] = {
 };
 
 Blockly.Blocks['math_multiply'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -545,7 +563,7 @@ Blockly.Blocks['math_multiply'] = {
 };
 
 Blockly.Blocks['math_subtract'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -557,7 +575,7 @@ Blockly.Blocks['math_subtract'] = {
 };
 
 Blockly.Blocks['math_divide'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -569,7 +587,7 @@ Blockly.Blocks['math_divide'] = {
 };
 //----
 Blockly.Blocks['random_int'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("1 ile 10 arasında bir sayı seç");
         this.setOutput(true, "Number");
@@ -579,31 +597,31 @@ Blockly.Blocks['random_int'] = {
 
 // Karşılaştırma Bloğu Tanımlama
 Blockly.Blocks['comparison_block'] = {
-  init: function() {
-    this.appendValueInput("A")
-        .setCheck("Number")
-        .appendField("Birinci değer");
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([
-          [">", "GT"],
-          ["<", "LT"],
-          ["=", "EQ"],
-          [">=", "GTE"],
-          ["<=", "LTE"]
-        ]), "OPERATOR");
-    this.appendValueInput("B")
-        .setCheck("Number")
-        .appendField("İkinci değer");
-    this.setInputsInline(true);
-    this.setOutput(true, "Boolean");
-    this.setColour(210);
-    this.setTooltip("Seçili operatöre göre iki değeri karşılaştırır.");
-    this.setHelpUrl("");
-  }
+    init: function () {
+        this.appendValueInput("A")
+            .setCheck("Number")
+            .appendField("Birinci değer");
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldDropdown([
+                [">", "GT"],
+                ["<", "LT"],
+                ["=", "EQ"],
+                [">=", "GTE"],
+                ["<=", "LTE"]
+            ]), "OPERATOR");
+        this.appendValueInput("B")
+            .setCheck("Number")
+            .appendField("İkinci değer");
+        this.setInputsInline(true);
+        this.setOutput(true, "Boolean");
+        this.setColour(210);
+        this.setTooltip("Seçili operatöre göre iki değeri karşılaştırır.");
+        this.setHelpUrl("");
+    }
 };
 
 Blockly.Blocks['logic_and'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Boolean");
         this.appendValueInput("B")
@@ -615,7 +633,7 @@ Blockly.Blocks['logic_and'] = {
 };
 
 Blockly.Blocks['logic_or'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Boolean");
         this.appendValueInput("B")
@@ -627,7 +645,7 @@ Blockly.Blocks['logic_or'] = {
 };
 
 Blockly.Blocks['math_modulo'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -639,7 +657,7 @@ Blockly.Blocks['math_modulo'] = {
 };
 
 Blockly.Blocks['math_round'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("NUM")
             .setCheck("Number")
             .appendField("yuvarla");
@@ -649,7 +667,7 @@ Blockly.Blocks['math_round'] = {
 };
 
 Blockly.Blocks['math_abs'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("NUM")
             .setCheck("Number")
             .appendField("mutlak değer");
@@ -659,7 +677,7 @@ Blockly.Blocks['math_abs'] = {
 };
 
 Blockly.Blocks['variables_set'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("VALUE")
             .appendField("değişkenin değerini")
             .appendField(new Blockly.FieldVariable("item"), "VAR");
@@ -672,7 +690,7 @@ Blockly.Blocks['variables_set'] = {
 };
 
 Blockly.Blocks['variables_change'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("DELTA")
             .setCheck("Number")
             .appendField("değişkenin değerini")
@@ -686,7 +704,7 @@ Blockly.Blocks['variables_change'] = {
 };
 
 Blockly.Blocks['lists_create'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Liste oluştur")
             .appendField(new Blockly.FieldVariable("liste"), "LIST");
@@ -697,7 +715,7 @@ Blockly.Blocks['lists_create'] = {
 };
 
 Blockly.Blocks['lists_add'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("ITEM")
             .appendField("Listeye")
             .appendField(new Blockly.FieldVariable("liste"), "LIST");
@@ -710,7 +728,7 @@ Blockly.Blocks['lists_add'] = {
 };
 
 Blockly.Blocks['lists_delete'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("INDEX")
             .setCheck("Number")
             .appendField("Listeden")
@@ -724,7 +742,7 @@ Blockly.Blocks['lists_delete'] = {
 };
 
 Blockly.Blocks['lists_clear'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("Listeyi")
             .appendField(new Blockly.FieldVariable("liste"), "LIST")
@@ -736,7 +754,7 @@ Blockly.Blocks['lists_clear'] = {
 };
 
 Blockly.Blocks['text_join'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck(null);
         this.appendValueInput("B")
@@ -748,7 +766,7 @@ Blockly.Blocks['text_join'] = {
 };
 
 Blockly.Blocks['logic_null'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("null");
         this.setOutput(true, null);
@@ -758,9 +776,9 @@ Blockly.Blocks['logic_null'] = {
 };
 
 Blockly.Blocks['logic_boolean'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
-            .appendField(new Blockly.FieldDropdown([["true","TRUE"], ["false","FALSE"]]), "BOOL");
+            .appendField(new Blockly.FieldDropdown([["true", "TRUE"], ["false", "FALSE"]]), "BOOL");
         this.setOutput(true, "Boolean");
         this.setColour(230);
         this.setTooltip("");
@@ -768,7 +786,7 @@ Blockly.Blocks['logic_boolean'] = {
 };
 
 Blockly.Blocks['text'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField(new Blockly.FieldTextInput(""), "TEXT");
         this.setOutput(true, "String");
@@ -778,7 +796,7 @@ Blockly.Blocks['text'] = {
 };
 
 Blockly.Blocks['math_number'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField(new Blockly.FieldNumber(0), "NUM");
         this.setOutput(true, "Number");
@@ -788,7 +806,7 @@ Blockly.Blocks['math_number'] = {
 };
 
 Blockly.Blocks['lists_create_with'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("ADD0")
             .appendField("create list with");
         this.appendValueInput("ADD1");
@@ -801,290 +819,292 @@ Blockly.Blocks['lists_create_with'] = {
 };
 
 // Kod üretimi için JavaScript generator tanımlamaları
-Blockly.JavaScript['pen_down'] = function(block) {
+Blockly.JavaScript.forBlock['pen_down'] = function (block) {
     return 'penDown = true;\nupdateCanvas();\n';
 };
 
-Blockly.JavaScript['pen_up'] = function(block) {
+Blockly.JavaScript.forBlock['pen_up'] = function (block) {
     return 'penDown = false;\nupdateCanvas();\n';
 };
 
-Blockly.JavaScript['move_steps'] = function(block) {
+Blockly.JavaScript.forBlock['move_steps'] = function (block) {
     var steps = Blockly.JavaScript.valueToCode(block, 'STEPS', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'moveSteps(' + steps + ');\n';
 };
 
-Blockly.JavaScript['turn_right'] = function(block) {
+Blockly.JavaScript.forBlock['turn_right'] = function (block) {
     var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'turnRight(' + angle + ');\n';
 };
 
-Blockly.JavaScript['turn_left'] = function(block) {
+Blockly.JavaScript.forBlock['turn_left'] = function (block) {
     var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'turnLeft(' + angle + ');\n';
 };
 
-Blockly.JavaScript['goto_random'] = function(block) {
+Blockly.JavaScript.forBlock['goto_random'] = function (block) {
     return 'gotoRandom();\n';
 };
 
-Blockly.JavaScript['goto_xy'] = function(block) {
+Blockly.JavaScript.forBlock['goto_xy'] = function (block) {
     var x = Blockly.JavaScript.valueToCode(block, 'X', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     var y = Blockly.JavaScript.valueToCode(block, 'Y', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'gotoXY(' + x + ', ' + y + ');\n';
 };
 
-Blockly.JavaScript['set_direction'] = function(block) {
+Blockly.JavaScript.forBlock['set_direction'] = function (block) {
     var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'setDirection(' + angle + ');\n';
 };
 
-Blockly.JavaScript['change_x'] = function(block) {
+Blockly.JavaScript.forBlock['change_x'] = function (block) {
     var dx = Blockly.JavaScript.valueToCode(block, 'DX', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'changeX(' + dx + ');\n';
 };
 
-Blockly.JavaScript['change_y'] = function(block) {
+Blockly.JavaScript.forBlock['change_y'] = function (block) {
     var dy = Blockly.JavaScript.valueToCode(block, 'DY', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'changeY(' + dy + ');\n';
 };
 
-Blockly.JavaScript['set_x'] = function(block) {
+Blockly.JavaScript.forBlock['set_x'] = function (block) {
     var x = Blockly.JavaScript.valueToCode(block, 'X', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'setX(' + x + ');\n';
 };
 
-Blockly.JavaScript['set_y'] = function(block) {
+Blockly.JavaScript.forBlock['set_y'] = function (block) {
     var y = Blockly.JavaScript.valueToCode(block, 'Y', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'setY(' + y + ');\n';
 };
 
-Blockly.JavaScript['bounce_on_edge'] = function(block) {
+Blockly.JavaScript.forBlock['bounce_on_edge'] = function (block) {
     return 'bounceOnEdge();\n';
 };
 
-Blockly.JavaScript['get_x'] = function(block) {
+Blockly.JavaScript.forBlock['get_x'] = function (block) {
     return ['getX()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['get_y'] = function(block) {
+Blockly.JavaScript.forBlock['get_y'] = function (block) {
     return ['getY()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['when_flag_clicked'] = function(block) {
+Blockly.JavaScript.forBlock['when_flag_clicked'] = function (block) {
     var branch = Blockly.JavaScript.statementToCode(block, 'STACK');
     return 'function startProgram() {\n' +
-           '    console.log("🚩 Yeşil bayrak tıklandı - Program başlıyor...");\n' +
-           '    clearCanvas();\n' +
-           '    initCanvas();\n' +
-           '    penDown = false;\n' + 
-           branch +
-           '}\nstartProgram();\n';
+        '    console.log("🚩 Yeşil bayrak tıklandı - Program başlıyor...");\n' +
+        '    clearCanvas();\n' +
+        '    initCanvas();\n' +
+        '    penDown = false;\n' +
+        branch +
+        '}\nstartProgram();\n';
 };
 
 
 
-Blockly.JavaScript['when_key_pressed'] = function(block) {
+Blockly.JavaScript.forBlock['when_key_pressed'] = function (block) {
+    var key = block.getFieldValue('KEY');
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-    return 'whenKeyPressed(function() {\n' + branch + '});\n';
+    return 'whenKeyPressed("' + key + '", function() {\n' + branch + '});\n';
 };
 
-Blockly.JavaScript['when_message_received'] = function(block) {
+Blockly.JavaScript.forBlock['when_message_received'] = function (block) {
+    var message = block.getFieldValue('MESSAGE');
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-    return 'whenMessageReceived(function() {\n' + branch + '});\n';
+    return 'whenMessageReceived("' + message + '", function() {\n' + branch + '});\n';
 };
 
-Blockly.JavaScript['broadcast'] = function(block) {
-    var message = Blockly.JavaScript.valueToCode(block, 'MESSAGE', Blockly.JavaScript.ORDER_ATOMIC) || '\'\'';
-    return 'broadcast(' + message + ');\n';
+Blockly.JavaScript.forBlock['broadcast'] = function (block) {
+    var message = block.getFieldValue('MESSAGE');
+    return 'broadcast("' + message + '");\n';
 };
 
-Blockly.JavaScript['wait_seconds'] = function(block) {
+Blockly.JavaScript.forBlock['wait_seconds'] = function (block) {
     var seconds = Blockly.JavaScript.valueToCode(block, 'SECONDS', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return 'waitSeconds(' + seconds + ');\n';
 };
 
-Blockly.JavaScript['repeat_times'] = function(block) {
-    console.log('repeat_times');
-    var repeats = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+Blockly.JavaScript.forBlock['repeat_times'] = function (block) {
+    var repeats = Blockly.JavaScript.valueToCode(block, 'TIMES', Blockly.JavaScript.ORDER_ATOMIC) || '10';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
-    return repeat_times(repeats);
+    var code = 'for (var count = 0; count < ' + repeats + '; count++) {\n' + branch + '}\n';
+    return code;
 };
 
-Blockly.JavaScript['forever'] = function(block) {
+Blockly.JavaScript.forBlock['forever'] = function (block) {
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'forever(function() {\n' + branch + '});\n';
 };
 
-Blockly.JavaScript['if'] = function(block) {
+Blockly.JavaScript.forBlock['if'] = function (block) {
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'if (' + condition + ') {\n' + branch + '}\n';
 };
 
-Blockly.JavaScript['if_else'] = function(block) {
+Blockly.JavaScript.forBlock['if_else'] = function (block) {
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch1 = Blockly.JavaScript.statementToCode(block, 'DO');
     var branch2 = Blockly.JavaScript.statementToCode(block, 'ELSE');
     return 'if (' + condition + ') {\n' + branch1 + '} else {\n' + branch2 + '}\n';
 };
 
-Blockly.JavaScript['wait_until'] = function(block) {
+Blockly.JavaScript.forBlock['wait_until'] = function (block) {
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     return 'waitUntil(' + condition + ');\n';
 };
 
-Blockly.JavaScript['repeat_until'] = function(block) {
+Blockly.JavaScript.forBlock['repeat_until'] = function (block) {
     var condition = Blockly.JavaScript.valueToCode(block, 'CONDITION', Blockly.JavaScript.ORDER_NONE) || 'false';
     var branch = Blockly.JavaScript.statementToCode(block, 'DO');
     return 'repeatUntil(' + condition + ', function() {\n' + branch + '});\n';
 };
 
-Blockly.JavaScript['stop'] = function(block) {
+Blockly.JavaScript.forBlock['stop'] = function (block) {
     return 'stop();\n';
 };
 
-Blockly.JavaScript['is_pen_down'] = function(block) {
+Blockly.JavaScript.forBlock['is_pen_down'] = function (block) {
     return ['isPenDown()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['timer'] = function(block) {
+Blockly.JavaScript.forBlock['timer'] = function (block) {
     return ['timer()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['reset_timer'] = function(block) {
+Blockly.JavaScript.forBlock['reset_timer'] = function (block) {
     return 'resetTimer();\n';
 };
 
-Blockly.JavaScript['current_hour'] = function(block) {
+Blockly.JavaScript.forBlock['current_hour'] = function (block) {
     return ['currentHour()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['current_minute'] = function(block) {
+Blockly.JavaScript.forBlock['current_minute'] = function (block) {
     return ['currentMinute()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['current_second'] = function(block) {
+Blockly.JavaScript.forBlock['current_second'] = function (block) {
     return ['currentSecond()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['math_add'] = function(block) {
+Blockly.JavaScript.forBlock['math_add'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
     return [a + ' + ' + b, Blockly.JavaScript.ORDER_ADDITION];
 };
 
-Blockly.JavaScript['math_multiply'] = function(block) {
+Blockly.JavaScript.forBlock['math_multiply'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
     return [a + ' * ' + b, Blockly.JavaScript.ORDER_MULTIPLICATION];
 };
 
-Blockly.JavaScript['math_subtract'] = function(block) {
+Blockly.JavaScript.forBlock['math_subtract'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
     return [a + ' - ' + b, Blockly.JavaScript.ORDER_SUBTRACTION];
 };
 
-Blockly.JavaScript['math_divide'] = function(block) {
+Blockly.JavaScript.forBlock['math_divide'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
     return [a + ' / ' + b, Blockly.JavaScript.ORDER_DIVISION];
 };
 
-Blockly.JavaScript['random_int'] = function(block) {
+Blockly.JavaScript.forBlock['random_int'] = function (block) {
     return ['randomInt(1, 10)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['logic_and'] = function(block) {
+Blockly.JavaScript.forBlock['logic_and'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || 'false';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || 'false';
     return [a + ' && ' + b, Blockly.JavaScript.ORDER_LOGICAL_AND];
 };
 
-Blockly.JavaScript['logic_or'] = function(block) {
+Blockly.JavaScript.forBlock['logic_or'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || 'false';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || 'false';
     return [a + ' || ' + b, Blockly.JavaScript.ORDER_LOGICAL_OR];
 };
 
-Blockly.JavaScript['math_modulo'] = function(block) {
+Blockly.JavaScript.forBlock['math_modulo'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';
     return [a + ' % ' + b, Blockly.JavaScript.ORDER_MODULUS];
 };
 
-Blockly.JavaScript['math_round'] = function(block) {
+Blockly.JavaScript.forBlock['math_round'] = function (block) {
     var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_NONE) || '0';
     return ['Math.round(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['math_abs'] = function(block) {
+Blockly.JavaScript.forBlock['math_abs'] = function (block) {
     var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_NONE) || '0';
     return ['Math.abs(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript['variables_set'] = function(block) {
+Blockly.JavaScript.forBlock['variables_set'] = function (block) {
     var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
     var varName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
     return varName + ' = ' + value + ';\n';
 };
 
-Blockly.JavaScript['variables_change'] = function(block) {
+Blockly.JavaScript.forBlock['variables_change'] = function (block) {
     var delta = Blockly.JavaScript.valueToCode(block, 'DELTA', Blockly.JavaScript.ORDER_ADDITION) || '0';
     var varName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
     return varName + ' += ' + delta + ';\n';
 };
 
-Blockly.JavaScript['lists_create'] = function(block) {
+Blockly.JavaScript.forBlock['lists_create'] = function (block) {
     var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + ' = [];\n';
 };
 
-Blockly.JavaScript['lists_add'] = function(block) {
+Blockly.JavaScript.forBlock['lists_add'] = function (block) {
     var item = Blockly.JavaScript.valueToCode(block, 'ITEM', Blockly.JavaScript.ORDER_NONE) || 'null';
     var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.push(' + item + ');\n';
 };
 
-Blockly.JavaScript['lists_delete'] = function(block) {
+Blockly.JavaScript.forBlock['lists_delete'] = function (block) {
     var index = Blockly.JavaScript.valueToCode(block, 'INDEX', Blockly.JavaScript.ORDER_NONE) || '0';
     var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.splice(' + index + ', 1);\n';
 };
 
-Blockly.JavaScript['lists_clear'] = function(block) {
+Blockly.JavaScript.forBlock['lists_clear'] = function (block) {
     var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.length = 0;\n';
 };
 
-Blockly.JavaScript['text_join'] = function(block) {
+Blockly.JavaScript.forBlock['text_join'] = function (block) {
     var valueA = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '\'\'';
     var valueB = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '\'\'';
     var code = valueA + ' + ' + valueB;
     return [code, Blockly.JavaScript.ORDER_ADDITION];
 };
 
-Blockly.JavaScript['logic_null'] = function(block) {
+Blockly.JavaScript.forBlock['logic_null'] = function (block) {
     return ['null', Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['logic_boolean'] = function(block) {
+Blockly.JavaScript.forBlock['logic_boolean'] = function (block) {
     var code = (block.getFieldValue('BOOL') === 'TRUE') ? 'true' : 'false';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['text'] = function(block) {
+Blockly.JavaScript.forBlock['text'] = function (block) {
     var code = JSON.stringify(block.getFieldValue('TEXT'));
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['math_number'] = function(block) {
+Blockly.JavaScript.forBlock['math_number'] = function (block) {
     var code = Number(block.getFieldValue('NUM'));
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['lists_create_with'] = function(block) {
+Blockly.JavaScript.forBlock['lists_create_with'] = function (block) {
     var elements = [];
     for (var i = 0; i < block.itemCount_; i++) {
         var element = Blockly.JavaScript.valueToCode(block, 'ADD' + i, Blockly.JavaScript.ORDER_NONE) || 'null';
@@ -1094,31 +1114,31 @@ Blockly.JavaScript['lists_create_with'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 // JavaScript Generator
-Blockly.JavaScript['comparison_block'] = function(block) {
-  var valueA = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-  var operator = block.getFieldValue('OPERATOR');
-  var valueB = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+Blockly.JavaScript.forBlock['comparison_block'] = function (block) {
+    var valueA = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    var operator = block.getFieldValue('OPERATOR');
+    var valueB = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '0';
 
-  var code = '';
-  switch (operator) {
-    case "GT":  // Büyüktür
-      code = valueA + ' > ' + valueB;
-      break;
-    case "LT":  // Küçüktür
-      code = valueA + ' < ' + valueB;
-      break;
-    case "EQ":  // Eşittir
-      code = valueA + ' === ' + valueB;
-      break;
-    case "GTE": // Büyük Eşittir
-      code = valueA + ' >= ' + valueB;
-      break;
-    case "LTE": // Küçük Eşittir
-      code = valueA + ' <= ' + valueB;
-      break;
-  }
+    var code = '';
+    switch (operator) {
+        case "GT":  // Büyüktür
+            code = valueA + ' > ' + valueB;
+            break;
+        case "LT":  // Küçüktür
+            code = valueA + ' < ' + valueB;
+            break;
+        case "EQ":  // Eşittir
+            code = valueA + ' === ' + valueB;
+            break;
+        case "GTE": // Büyük Eşittir
+            code = valueA + ' >= ' + valueB;
+            break;
+        case "LTE": // Küçük Eşittir
+            code = valueA + ' <= ' + valueB;
+            break;
+    }
 
-  return [code, Blockly.JavaScript.ORDER_RELATIONAL];
+    return [code, Blockly.JavaScript.ORDER_RELATIONAL];
 };
 
 // Blockly temel yapılandırması
@@ -1151,7 +1171,7 @@ const blocklyConfig = {
 
 document.addEventListener('DOMContentLoaded', () => {
     //const workspace = Blockly.inject('blocklyDiv', blocklyConfig);
-    
+
     // Çalışma alanını ayarla
     workspace.addChangeListener((event) => {
         if (event.type === Blockly.Events.BLOCK_CREATE ||
@@ -1170,7 +1190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
     // Pencere yeniden boyutlandırıldığında Blockly'yi güncelle
     window.addEventListener('resize', () => {
         const blocklyArea = document.getElementById('blocklyArea');
@@ -1179,12 +1199,12 @@ document.addEventListener('DOMContentLoaded', () => {
             x: blocklyArea.offsetLeft,
             y: blocklyArea.offsetTop
         };
-        
+
         blocklyDiv.style.left = position.x + 'px';
         blocklyDiv.style.top = position.y + 'px';
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
         blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-        
+
         Blockly.svgResize(workspace);
     });
 });

@@ -1,36 +1,323 @@
-<xml id="toolbox" class="hidden-toolbox">
-    <category name="Hareket" colour="160">
+<!-- Blockly Toolbox XML -->
+<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+
+    <!-- Hareket Kategorisi -->
+    <category name="Hareket" colour="#4C97FF">
         <block type="pen_down"></block>
         <block type="pen_up"></block>
-        <block type="move_steps"></block>
-        <block type="turn_right"></block>
-        <block type="turn_left"></block>
-        <block type="goto_xy"></block>
+        <block type="set_pen_color"></block>
+        <block type="set_pen_size">
+            <value name="SIZE">
+                <shadow type="math_number">
+                    <field name="NUM">2</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="set_pen_color_rgb">
+            <value name="R">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="G">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="move_steps">
+            <value name="STEPS">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="turn_right">
+            <value name="ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">15</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="turn_left">
+            <value name="ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">15</field>
+                </shadow>
+            </value>
+        </block>
         <block type="goto_random"></block>
-        <block type="set_direction"></block>
-        <block type="change_x"></block>
-        <block type="change_y"></block>
-        <block type="set_x"></block>
-        <block type="set_y"></block>
+        <block type="goto_xy">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="set_direction">
+            <value name="ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">90</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="change_x">
+            <value name="DX">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="change_y">
+            <value name="DY">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="set_x">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="set_y">
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
         <block type="bounce_on_edge"></block>
         <block type="get_x"></block>
         <block type="get_y"></block>
+        <block type="get_pen_color"></block>
+        <block type="get_pen_size"></block>
     </category>
-    <category name="Kontrol" colour="120">
+
+    <!-- Şekiller Kategorisi -->
+    <category name="Şekiller" colour="#9966FF">
+        <block type="draw_circle">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="RADIUS">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_filled_circle">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="RADIUS">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_rectangle">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="WIDTH">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+            <value name="HEIGHT">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_filled_rectangle">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="WIDTH">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+            <value name="HEIGHT">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_polygon">
+            <value name="SIDES">
+                <shadow type="math_number">
+                    <field name="NUM">6</field>
+                </shadow>
+            </value>
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="RADIUS">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_line">
+            <value name="X1">
+                <shadow type="math_number">
+                    <field name="NUM">-50</field>
+                </shadow>
+            </value>
+            <value name="Y1">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="X2">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+            <value name="Y2">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="draw_arc">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="RADIUS">
+                <shadow type="math_number">
+                    <field name="NUM">50</field>
+                </shadow>
+            </value>
+            <value name="START_ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="END_ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">180</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="set_background_color"></block>
+    </category>
+
+    <!-- Fizik Kategorisi -->
+    <category name="Fizik" colour="#FF0000">
+        <!-- Sabitler -->
+        <block type="physics_gravity"></block>
+
+        <!-- Hareket Simülasyonları -->
+        <block type="projectile_motion"></block>
+        <block type="free_fall"></block>
+        <block type="horizontal_throw"></block>
+        <block type="circular_motion"></block>
+        <block type="harmonic_motion"></block>
+
+        <!-- Hesaplamalar -->
+        <block type="projectile_max_height"></block>
+        <block type="projectile_range"></block>
+        <block type="projectile_flight_time"></block>
+    </category>
+
+    <!-- Olaylar Kategorisi -->
+    <category name="Olaylar" colour="#FFBF00">
         <block type="when_flag_clicked"></block>
-        <block type="when_key_pressed"></block>
-        <block type="when_message_received"></block>
-        <block type="broadcast"></block>
-        <block type="wait_seconds"></block>
-        <block type="repeat_times"></block>
+        <block type="when_key_pressed">
+            <field name="KEY">space</field>
+        </block>
+        <block type="when_message_received">
+            <field name="MESSAGE">mesaj1</field>
+        </block>
+        <block type="broadcast">
+            <field name="MESSAGE">mesaj1</field>
+        </block>
+    </category>
+
+    <!-- Kontrol Kategorisi -->
+    <category name="Kontrol" colour="#FFAB19">
+        <block type="repeat_times">
+            <value name="TIMES">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
         <block type="forever"></block>
+        <block type="repeat_until"></block>
         <block type="if"></block>
         <block type="if_else"></block>
-        <block type="wait_until"></block>
-        <block type="repeat_until"></block>
         <block type="stop"></block>
+        <block type="wait_seconds">
+            <value name="SECONDS">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="wait_until"></block>
     </category>
-    <category name="Algılama" colour="200">
+
+    <!-- Algılama Kategorisi -->
+    <category name="Algılama" colour="#5CB1D6">
         <block type="is_pen_down"></block>
         <block type="timer"></block>
         <block type="reset_timer"></block>
@@ -38,34 +325,81 @@
         <block type="current_minute"></block>
         <block type="current_second"></block>
     </category>
-    <category name="Matematik" colour="230">
-        <block type="math_number"></block>
+
+    <!-- Matematik Kategorisi -->
+    <category name="Matematik" colour="#59C059">
+        <!-- Temel -->
+        <block type="math_number">
+            <field name="NUM">0</field>
+        </block>
         <block type="math_add"></block>
         <block type="math_subtract"></block>
         <block type="math_multiply"></block>
         <block type="math_divide"></block>
         <block type="math_modulo"></block>
+
+        <!-- Yuvarlama -->
         <block type="math_round"></block>
+        <block type="math_floor"></block>
+        <block type="math_ceil"></block>
         <block type="math_abs"></block>
+
+        <!-- Rastgele -->
         <block type="random_int"></block>
+        <block type="random_range"></block>
+
+        <!-- Min/Max -->
+        <block type="math_min"></block>
+        <block type="math_max"></block>
+
+        <!-- Sabitler -->
+        <block type="math_pi"></block>
+        <block type="math_e"></block>
+        <block type="math_phi"></block>
+
+        <!-- Üs ve Kök -->
+        <block type="math_square"></block>
+        <block type="math_sqrt"></block>
+        <block type="math_pow"></block>
+
+        <!-- Logaritma -->
+        <block type="math_log10"></block>
+        <block type="math_ln"></block>
+
+        <!-- Trigonometri -->
+        <block type="math_sin"></block>
+        <block type="math_cos"></block>
+        <block type="math_tan"></block>
+        <block type="math_asin"></block>
+        <block type="math_acos"></block>
+        <block type="math_atan"></block>
+
+        <!-- Açı Dönüşümü -->
+        <block type="math_to_radians"></block>
+        <block type="math_to_degrees"></block>
     </category>
-    <category name="Mantık" colour="210">
+
+    <!-- Metin Kategorisi -->
+    <category name="Metin" colour="#FF6680">
+        <block type="text">
+            <field name="TEXT"></field>
+        </block>
+        <block type="text_join"></block>
+    </category>
+
+    <!-- Mantık Kategorisi -->
+    <category name="Mantık" colour="#5CB1D6">
         <block type="comparison_block"></block>
         <block type="logic_and"></block>
         <block type="logic_or"></block>
         <block type="logic_boolean"></block>
         <block type="logic_null"></block>
     </category>
-    <category name="Değişkenler" colour="330" custom="VARIABLE"></category>
-    <category name="Listeler" colour="260">
-        <block type="lists_create"></block>
-        <block type="lists_add"></block>
-        <block type="lists_delete"></block>
-        <block type="lists_clear"></block>
-        <block type="lists_create_with"></block>
-    </category>
-    <category name="Metin" colour="160">
-        <block type="text"></block>
-        <block type="text_join"></block>
-    </category>
+
+    <!-- Değişkenler Kategorisi -->
+    <category name="Değişkenler" colour="#FF8C1A" custom="VARIABLE"></category>
+
+    <!-- Listeler Kategorisi -->
+    <category name="Listeler" colour="#FF661A" custom="PROCEDURE"></category>
+
 </xml>

@@ -1,4 +1,6 @@
-from venv import logger
+import logging
+
+logger = logging.getLogger(__name__)
 
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -31,7 +33,7 @@ class BlocklyProjectView(View):
         return JsonResponse({
             'id': project.id,
             'name': project.name,
-            'xml_data': project.xml_data,
+            'xml_data': project.block_data,
             'created_at': project.created_at,
             'updated_at': project.updated_at
         }, encoder=DjangoJSONEncoder, safe=False)
@@ -40,7 +42,7 @@ class BlocklyProjectView(View):
         try:
             data = json.loads(request.body)
             project = get_object_or_404(BlocklyProject, id=project_id)
-            project.xml_data = data.get('blocks', '')
+            project.block_data = data.get('blocks', '')
             project.save()
             return JsonResponse({'success': True, 'updated_at': project.updated_at}, encoder=DjangoJSONEncoder)
         except Exception as e:
@@ -395,7 +397,8 @@ def get_project_info(request, project_id):
             'description': project.description,
             'created_at': project.created_at,
             'updated_at': project.updated_at,
-            'is_public': getattr(project, 'is_public', False)
+            'is_public': getattr(project, 'is_public', False),
+            'xml_data': project.block_data  # XML verisini ekle
         }, encoder=DjangoJSONEncoder)
     except Exception as e:
         logger.error(f"Proje bilgileri alınırken hata oluştu: {str(e)}")
