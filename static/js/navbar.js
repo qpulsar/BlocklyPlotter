@@ -7,14 +7,14 @@ function generateUniqueFilename() {
     return filename + (counter > 1 ? ' ' + ('0' + counter).slice(-2) : '');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Proje adını al
     var projectNameInput = document.getElementById('projectName');
     if (projectNameInput) {
         // URL'den proje ID'sini al
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id');
-        
+
         if (projectId) {
             // Önce localStorage'dan proje adını kontrol et
             const storedProjectName = localStorage.getItem('currentProjectName');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Kullandıktan sonra localStorage'dan kaldır
                 localStorage.removeItem('currentProjectName');
             }
-            
+
             // Proje ID'si varsa, proje bilgilerini ve XML verisini al
             fetch(`/blockly/get_project_info/${projectId}/`)
                 .then(response => response.json())
@@ -31,19 +31,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.success) {
                         // Proje adını ayarla
                         projectNameInput.value = data.project_name;
-                        
+
                         // Proje XML verisini al ve workspace'e yükle
                         if (data.xml_data) {
                             try {
                                 // Workspace'i temizle
                                 Blockly.getMainWorkspace().clear();
-                                
-                                // XML verisini parse et
-                                const xml = Blockly.Xml.textToDom(data.xml_data);
-                                
+
+                                // XML verisini parse et (Blockly v12 uyumlu)
+                                var parser = new DOMParser();
+                                var xmlDoc = parser.parseFromString(data.xml_data, "text/xml");
+
                                 // XML'i workspace'e yükle
-                                Blockly.Xml.domToWorkspace(xml, Blockly.getMainWorkspace());
-                                
+                                Blockly.Xml.domToWorkspace(xmlDoc.documentElement, Blockly.getMainWorkspace());
+
                                 console.log('Proje XML verisi başarıyla yüklendi');
                             } catch (error) {
                                 console.error('XML verisi yüklenirken hata oluştu:', error);
@@ -58,21 +59,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 .catch(error => console.error('Error fetching project info:', error));
         }
     }
-    
+
     // Dosya kaydetme işlemi
-    document.getElementById('saveFile').addEventListener('click', function() {
+    document.getElementById('saveFile').addEventListener('click', function () {
         // Get the workspace XML
         var workspace = Blockly.getMainWorkspace();
         var xml = Blockly.Xml.workspaceToDom(workspace);
         var xmlText = Blockly.Xml.domToText(xml);
-        
+
         // Get project name
         var projectName = document.getElementById('projectName').value || 'Isimsiz Proje';
 
         // Get canvas thumbnail as base64
         const outputCanvas = document.getElementById('outputCanvas');
         let canvasThumbnail = '';
-        
+
         try {
             // Canvas'ı doğrudan thumbnail olarak kullan
             canvasThumbnail = outputCanvas.toDataURL('image/png');
@@ -80,30 +81,30 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error generating canvas thumbnail:', error);
         }
-        
+
         // Get blocks thumbnail as base64
         let blockThumbnail = '';
-        
+
         try {
             console.log('Blockly kod bloklarının ekran görüntüsü alınıyor...');
-            
+
             // Doğrudan Blockly'nin SVG elementini bul
             const blocklySvg = document.querySelector('.blocklySvg');
-            
+
             if (blocklySvg) {
                 console.log('Blockly SVG elementi bulundu:', blocklySvg);
-                
+
                 // SVG'yi bir string'e dönüştür
                 const svgData = new XMLSerializer().serializeToString(blocklySvg);
                 // SVG'yi data URL'e dönüştür
                 blockThumbnail = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
                 console.log('SVG data URL oluşturuldu, boyut:', blockThumbnail.length);
-                
+
                 // SVG'yi PNG'ye dönüştür
                 const img = new Image();
                 img.src = blockThumbnail;
-                
-                img.onload = function() {
+
+                img.onload = function () {
                     const canvas = document.createElement('canvas');
                     canvas.width = blocklySvg.getBoundingClientRect().width;
                     canvas.height = blocklySvg.getBoundingClientRect().height;
@@ -111,35 +112,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     ctx.drawImage(img, 0, 0);
                     blockThumbnail = canvas.toDataURL('image/png');
                     console.log('PNG olarak block thumbnail oluşturuldu, boyut:', blockThumbnail.length);
-                    
+
                     // Veriyi sunucuya gönder
                     sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
                 };
-                
+
                 // img.onload içinde sendDataToServer çağrılacağı için burada return
                 return;
             } else {
                 console.error('Blockly SVG elementi bulunamadı!');
-                
+
                 // SVG bulunamadığında alternatif bir yaklaşım
                 const workspace = Blockly.getMainWorkspace();
                 if (workspace) {
                     console.log('Blockly workspace bulundu, doğrudan SVG oluşturuluyor...');
-                    
+
                     try {
                         // Workspace'den SVG oluştur
                         const svg = workspace.svgBlockCanvas_.cloneNode(true);
                         svg.removeAttribute("transform");
-                        
+
                         const svgData = new XMLSerializer().serializeToString(svg);
                         blockThumbnail = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
                         console.log('Workspace SVG data URL oluşturuldu, boyut:', blockThumbnail.length);
-                        
+
                         // SVG'yi PNG'ye dönüştür
                         const img = new Image();
                         img.src = blockThumbnail;
-                        
-                        img.onload = function() {
+
+                        img.onload = function () {
                             const canvas = document.createElement('canvas');
                             canvas.width = 600;
                             canvas.height = 400;
@@ -147,11 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             ctx.drawImage(img, 0, 0);
                             blockThumbnail = canvas.toDataURL('image/png');
                             console.log('PNG olarak block thumbnail oluşturuldu, boyut:', blockThumbnail.length);
-                            
+
                             // Veriyi sunucuya gönder
                             sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
                         };
-                        
+
                         // img.onload içinde sendDataToServer çağrılacağı için burada return
                         return;
                     } catch (svgError) {
@@ -164,25 +165,25 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error generating block thumbnail:', error);
         }
-        
+
         console.log('Canvas thumbnail boyutu:', canvasThumbnail.length);
         console.log('Block thumbnail boyutu:', blockThumbnail.length);
-        
+
         // Veriyi sunucuya gönder
         sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
     });
-    
+
     // Veriyi sunucuya gönderen fonksiyon
     function sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail) {
         console.log('Veriler sunucuya gönderiliyor...');
         console.log('Canvas thumbnail boyutu:', canvasThumbnail.length);
         console.log('Block thumbnail boyutu:', blockThumbnail.length);
-        
+
         // Thumbnail'lerin varlığını kontrol et
         if (!blockThumbnail || blockThumbnail.length < 100) {
             console.warn('Block thumbnail oluşturulamadı veya çok küçük!');
         }
-        
+
         // Send the XML data to the server
         fetch('/blockly/save/', {
             method: 'POST',
@@ -197,23 +198,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 block_thumbnail: blockThumbnail
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Proje başarıyla kaydedildi!');
-                console.log('Proje ID:', data.project_id);
-            } else {
-                alert('Proje kaydedilirken bir hata oluştu: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving project:', error);
-            alert('Proje kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Proje başarıyla kaydedildi!');
+                    console.log('Proje ID:', data.project_id);
+                } else {
+                    alert('Proje kaydedilirken bir hata oluştu: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error saving project:', error);
+                alert('Proje kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
+            });
     }
-    
+
     // Yeni dosya oluşturma
-    document.getElementById('newFile').addEventListener('click', function() {
+    document.getElementById('newFile').addEventListener('click', function () {
         if (confirm('Yeni bir proje oluşturmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacaktır.')) {
             // Workspace'i temizle
             Blockly.getMainWorkspace().clear();

@@ -51,7 +51,6 @@ Blockly.Blocks['projectile_motion'] = {
         this.setTooltip("Eğik atış yörüngesini çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -92,7 +91,6 @@ Blockly.Blocks['free_fall'] = {
         this.setTooltip("Serbest düşüş hareketini çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -134,7 +132,6 @@ Blockly.Blocks['horizontal_throw'] = {
         this.setTooltip("Yatay atış hareketini çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -180,7 +177,6 @@ Blockly.Blocks['circular_motion'] = {
         this.setTooltip("Düzgün dairesel hareket çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -227,7 +223,6 @@ Blockly.Blocks['harmonic_motion'] = {
         this.setTooltip("Basit harmonik hareket (sinüs dalgası) çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [

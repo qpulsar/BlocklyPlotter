@@ -109,8 +109,10 @@ window.addEventListener('load', function () {
             try {
                 // En son çalışılan projeyi yükle
                 console.log('En son çalışılan proje yükleniyor...');
-                const xml = Blockly.Xml.textToDom(lastProjectXml);
-                Blockly.Xml.domToWorkspace(xml, workspace);
+                // Blockly v12'de textToDom yerine DOMParser kullanılmalı
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(lastProjectXml, "text/xml");
+                Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
             } catch (error) {
                 console.error('En son çalışılan proje yüklenirken hata oluştu:', error);
                 // Hata durumunda minimal bir başlangıç bloğu yükle

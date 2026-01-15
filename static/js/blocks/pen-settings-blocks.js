@@ -7,6 +7,22 @@
 // BLOK TANIMLARI
 // =====================================================
 
+// Renk seçenekleri
+const PEN_COLORS = [
+    ['Siyah', '#000000'],
+    ['Beyaz', '#FFFFFF'],
+    ['Kırmızı', '#FF0000'],
+    ['Yeşil', '#00FF00'],
+    ['Mavi', '#0000FF'],
+    ['Sarı', '#FFFF00'],
+    ['Turuncu', '#FF8000'],
+    ['Mor', '#8000FF'],
+    ['Pembe', '#FF00FF'],
+    ['Cyan', '#00FFFF'],
+    ['Kahverengi', '#8B4513'],
+    ['Gri', '#808080']
+];
+
 /**
  * Kalem rengini ayarla bloğu
  */
@@ -14,7 +30,7 @@ Blockly.Blocks['set_pen_color'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("Kalem rengini")
-            .appendField(new Blockly.FieldColour('#000000'), 'COLOR')
+            .appendField(new Blockly.FieldDropdown(PEN_COLORS), 'COLOR')
             .appendField("yap");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
@@ -40,15 +56,6 @@ Blockly.Blocks['set_pen_size'] = {
         this.setColour(160);
         this.setTooltip("Kalemin çizgi kalınlığını değiştirir");
         this.setHelpUrl("");
-
-        // Shadow blok ekle
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '2';
-        shadow.appendChild(field);
-        this.getInput('SIZE').connection.setShadowDom(shadow);
     }
 };
 
@@ -59,7 +66,7 @@ Blockly.Blocks['set_background_color'] = {
     init: function () {
         this.appendDummyInput()
             .appendField("Arkaplan rengini")
-            .appendField(new Blockly.FieldColour('#FFFFFF'), 'COLOR')
+            .appendField(new Blockly.FieldDropdown(PEN_COLORS), 'COLOR')
             .appendField("yap");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);

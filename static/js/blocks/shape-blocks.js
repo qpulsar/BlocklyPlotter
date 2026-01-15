@@ -29,7 +29,6 @@ Blockly.Blocks['draw_circle'] = {
         this.setHelpUrl("");
 
         // Shadow blokları ekle
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -75,7 +74,6 @@ Blockly.Blocks['draw_rectangle'] = {
         this.setTooltip("Belirtilen konum ve boyutlarda dikdörtgen çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -122,7 +120,6 @@ Blockly.Blocks['draw_polygon'] = {
         this.setTooltip("Belirtilen kenar sayısı ile düzgün çokgen çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -169,7 +166,6 @@ Blockly.Blocks['draw_line'] = {
         this.setTooltip("İki nokta arasında çizgi çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -219,7 +215,6 @@ Blockly.Blocks['draw_arc'] = {
         this.setTooltip("Belirtilen açılar arasında yay çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -264,7 +259,6 @@ Blockly.Blocks['draw_filled_circle'] = {
         this.setTooltip("İçi dolu daire çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [
@@ -310,7 +304,6 @@ Blockly.Blocks['draw_filled_rectangle'] = {
         this.setTooltip("İçi dolu dikdörtgen çizer");
         this.setHelpUrl("");
 
-        this._addShadowBlocks();
     },
     _addShadowBlocks: function () {
         const inputs = [

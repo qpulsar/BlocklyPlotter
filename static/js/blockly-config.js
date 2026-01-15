@@ -890,14 +890,9 @@ Blockly.JavaScript.forBlock['get_y'] = function (block) {
 };
 
 Blockly.JavaScript.forBlock['when_flag_clicked'] = function (block) {
-    var branch = Blockly.JavaScript.statementToCode(block, 'STACK');
-    return 'function startProgram() {\n' +
-        '    console.log("🚩 Yeşil bayrak tıklandı - Program başlıyor...");\n' +
-        '    clearCanvas();\n' +
-        '    initCanvas();\n' +
-        '    penDown = false;\n' +
-        branch +
-        '}\nstartProgram();\n';
+    // Bu blok sadece başlangıç noktası olarak kullanılıyor
+    // Bağlı bloklar main.js'de executeBlock ile yürütülüyor
+    return '';
 };
 
 
