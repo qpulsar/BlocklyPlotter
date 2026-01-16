@@ -99,63 +99,43 @@ def save_workspace(request):
         if not block_data:
             return handle_json_response(success=False, error='Block verisi boş olamaz!', status=400)
 
-        # Proje adı belirtilmemişse veya boşsa "untitled" olarak ayarla
-        if not project_name:
-            # Mevcut "untitled" projelerini kontrol et
-            existing_untitled = BlocklyProject.objects.filter(
-                user=request.user,
-                name__startswith='untitled'
-            ).values_list('name', flat=True)
-            
-            if not existing_untitled or 'untitled' not in existing_untitled:
-                project_name = 'untitled'
-            else:
-                # Numaralandırılmış untitled projelerini bul
-                numbered_projects = [name for name in existing_untitled if name.startswith('untitled') and len(name) > 8]
-                
-                if 'untitled' in existing_untitled and not numbered_projects:
-                    # Sadece "untitled" varsa, "untitled01" olarak ayarla
-                    project_name = 'untitled01'
-                else:
-                    # En yüksek numarayı bul ve bir artır
-                    max_num = 0
-                    for name in numbered_projects:
-                        try:
-                            num = int(name[8:])
-                            max_num = max(max_num, num)
-                        except ValueError:
-                            continue
-                    
-                    # Yeni numara oluştur (2 basamaklı format)
-                    project_name = f'untitled{max_num + 1:02d}'
+        # Proje ID'sini al (Eğer güncelleme ise)
+        project_id = data.get('project_id')
+        
+        # 'blocks' parametresini al (workspace verisi)
+        block_data = data.get('blocks')
+        
+        # Workspace verilerini kontrol et
+        if not block_data:
+            return handle_json_response(success=False, error='Block verisi boş olamaz!', status=400)
 
-        # Debug için tüm request verilerini loglayalım
-        logger.debug(f"Kayıt İsteği Detayları:\n"
-                     f"Kullanıcı: {request.user}\n"
-                     f"Proje Adı: {project_name}\n"
-                     f"Block Veri Boyutu: {len(str(block_data)) if block_data else 0} karakter")
+        # Proje adını al
+        project_name = (data.get('name') or data.get('projectName') or 'isimsiz').strip()
 
-        # Block verisini string'e çevir (eğer dict veya list ise)
-        if isinstance(block_data, (dict, list)):
-            block_data_str = json.dumps(block_data)
-        else:
-            block_data_str = str(block_data)
-            
-        logger.debug(f"Kaydedilecek block verisi: {block_data_str[:100]}...")
+        # Proje nesnesini bul veya oluştur
+        project = None
+        created = False
+        if project_id:
+            try:
+                project = BlocklyProject.objects.get(id=project_id, user=request.user)
+                project.name = project_name
+            except BlocklyProject.DoesNotExist:
+                logger.warning(f"ID ile proje bulunamadı: {project_id}, yeni proje oluşturulacak.")
+        
+        if not project:
+            project = BlocklyProject(user=request.user, name=project_name)
+            created = True
 
-        # Proje oluştur/güncelle
-        project, created = BlocklyProject.objects.get_or_create(
-            user=request.user,
-            name=project_name,
-            defaults={
-                'block_data': block_data_str,
-                'description': 'Otomatik oluşturuldu'
-            }
-        )
-
-        if not created:
-            project.block_data = block_data_str
-            project.updated_at = timezone.now()  # Güncelleme zamanını güncelle
+        project.block_data = block_data if isinstance(block_data, str) else json.dumps(block_data)
+        project.description = project.description or 'Otomatik oluşturuldu'
+        project.updated_at = timezone.now()
+        
+        # Thumbnail verilerini al
+        canvas_thumbnail_data = data.get('canvas_thumbnail', '')
+        block_thumbnail_data = data.get('block_thumbnail', '')
+        
+        # Projeyi kaydet (Thumbnail'ler kaydedilmeden önce ID oluşması için gerekebilir)
+        project.save()
         
         # Canvas thumbnail'i kaydet
         if canvas_thumbnail_data and canvas_thumbnail_data.startswith('data:image/png;base64,'):

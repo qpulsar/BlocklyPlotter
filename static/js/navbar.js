@@ -7,184 +7,176 @@ function generateUniqueFilename() {
     return filename + (counter > 1 ? ' ' + ('0' + counter).slice(-2) : '');
 }
 
+// Global proje durumu
+window.currentProjectId = null;
+
 document.addEventListener('DOMContentLoaded', function () {
     // Proje adını al
     var projectNameInput = document.getElementById('projectName');
+    var codePreviewPanel = document.getElementById('codePreviewPanel');
+    var togglePreviewBtn = document.getElementById('togglePreview');
+    var closePreviewBtn = document.getElementById('closePreview');
+    var generatedCodePre = document.getElementById('generatedCode');
+
     if (projectNameInput) {
         // URL'den proje ID'sini al
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id');
 
         if (projectId) {
-            // Önce localStorage'dan proje adını kontrol et
-            const storedProjectName = localStorage.getItem('currentProjectName');
-            if (storedProjectName) {
-                projectNameInput.value = storedProjectName;
-                // Kullandıktan sonra localStorage'dan kaldır
-                localStorage.removeItem('currentProjectName');
-            }
+            window.currentProjectId = projectId;
 
-            // Proje ID'si varsa, proje bilgilerini ve XML verisini al
+            // Proje bilgilerini al
             fetch(`/blockly/get_project_info/${projectId}/`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Proje adını ayarla
                         projectNameInput.value = data.project_name;
 
-                        // Proje XML verisini al ve workspace'e yükle
+                        // Proje verisini al ve workspace'e yükle
                         if (data.xml_data) {
                             try {
-                                // Workspace'i temizle
-                                Blockly.getMainWorkspace().clear();
+                                const workspace = Blockly.getMainWorkspace();
+                                workspace.clear();
 
-                                // XML verisini parse et (Blockly v12 uyumlu)
-                                var parser = new DOMParser();
-                                var xmlDoc = parser.parseFromString(data.xml_data, "text/xml");
+                                // JSON denemesi (Yeni sistem)
+                                try {
+                                    const state = JSON.parse(data.xml_data);
+                                    Blockly.serialization.workspaces.load(state, workspace);
+                                    console.log('Proje JSON verisi yüklendi');
+                                } catch (e) {
+                                    // Eski XML sistemi fallback (v12 uyumlu)
+                                    var parser = new DOMParser();
+                                    var xmlDoc = parser.parseFromString(data.xml_data, "text/xml");
+                                    Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
+                                    console.log('Proje XML verisi yüklendi (fallback)');
+                                }
 
-                                // XML'i workspace'e yükle
-                                Blockly.Xml.domToWorkspace(xmlDoc.documentElement, Blockly.getMainWorkspace());
-
-                                console.log('Proje XML verisi başarıyla yüklendi');
+                                // Yükleme sonrası kod üret
+                                updateCodePreview();
                             } catch (error) {
-                                console.error('XML verisi yüklenirken hata oluştu:', error);
+                                console.error('Veri yüklenirken hata oluştu:', error);
                             }
-                        } else {
-                            console.warn('Proje XML verisi bulunamadı');
                         }
-                    } else {
-                        console.error('Proje bilgileri alınamadı:', data.error);
                     }
-                })
-                .catch(error => console.error('Error fetching project info:', error));
+                });
         }
     }
 
-    // Dosya kaydetme işlemi
-    document.getElementById('saveFile').addEventListener('click', function () {
-        // Get the workspace XML
-        var workspace = Blockly.getMainWorkspace();
-        var xml = Blockly.Xml.workspaceToDom(workspace);
-        var xmlText = Blockly.Xml.domToText(xml);
-
-        // Get project name
-        var projectName = document.getElementById('projectName').value || 'Isimsiz Proje';
-
-        // Get canvas thumbnail as base64
-        const outputCanvas = document.getElementById('outputCanvas');
-        let canvasThumbnail = '';
-
-        try {
-            // Canvas'ı doğrudan thumbnail olarak kullan
-            canvasThumbnail = outputCanvas.toDataURL('image/png');
-            console.log('Canvas thumbnail oluşturuldu');
-        } catch (error) {
-            console.error('Error generating canvas thumbnail:', error);
+    // Kod Önizleme Toggle
+    function updateCodePreview() {
+        if (!codePreviewPanel.classList.contains('d-none')) {
+            const workspace = Blockly.getMainWorkspace();
+            const code = Blockly.JavaScript.workspaceToCode(workspace);
+            generatedCodePre.textContent = code;
         }
+    }
 
-        // Get blocks thumbnail as base64
-        let blockThumbnail = '';
-
-        try {
-            console.log('Blockly kod bloklarının ekran görüntüsü alınıyor...');
-
-            // Doğrudan Blockly'nin SVG elementini bul
-            const blocklySvg = document.querySelector('.blocklySvg');
-
-            if (blocklySvg) {
-                console.log('Blockly SVG elementi bulundu:', blocklySvg);
-
-                // SVG'yi bir string'e dönüştür
-                const svgData = new XMLSerializer().serializeToString(blocklySvg);
-                // SVG'yi data URL'e dönüştür
-                blockThumbnail = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
-                console.log('SVG data URL oluşturuldu, boyut:', blockThumbnail.length);
-
-                // SVG'yi PNG'ye dönüştür
-                const img = new Image();
-                img.src = blockThumbnail;
-
-                img.onload = function () {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = blocklySvg.getBoundingClientRect().width;
-                    canvas.height = blocklySvg.getBoundingClientRect().height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    blockThumbnail = canvas.toDataURL('image/png');
-                    console.log('PNG olarak block thumbnail oluşturuldu, boyut:', blockThumbnail.length);
-
-                    // Veriyi sunucuya gönder
-                    sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
-                };
-
-                // img.onload içinde sendDataToServer çağrılacağı için burada return
-                return;
-            } else {
-                console.error('Blockly SVG elementi bulunamadı!');
-
-                // SVG bulunamadığında alternatif bir yaklaşım
-                const workspace = Blockly.getMainWorkspace();
-                if (workspace) {
-                    console.log('Blockly workspace bulundu, doğrudan SVG oluşturuluyor...');
-
-                    try {
-                        // Workspace'den SVG oluştur
-                        const svg = workspace.svgBlockCanvas_.cloneNode(true);
-                        svg.removeAttribute("transform");
-
-                        const svgData = new XMLSerializer().serializeToString(svg);
-                        blockThumbnail = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
-                        console.log('Workspace SVG data URL oluşturuldu, boyut:', blockThumbnail.length);
-
-                        // SVG'yi PNG'ye dönüştür
-                        const img = new Image();
-                        img.src = blockThumbnail;
-
-                        img.onload = function () {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = 600;
-                            canvas.height = 400;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            blockThumbnail = canvas.toDataURL('image/png');
-                            console.log('PNG olarak block thumbnail oluşturuldu, boyut:', blockThumbnail.length);
-
-                            // Veriyi sunucuya gönder
-                            sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
-                        };
-
-                        // img.onload içinde sendDataToServer çağrılacağı için burada return
-                        return;
-                    } catch (svgError) {
-                        console.error('SVG oluşturma hatası:', svgError);
-                    }
-                } else {
-                    console.error('Blockly workspace de bulunamadı!');
-                }
-            }
-        } catch (error) {
-            console.error('Error generating block thumbnail:', error);
-        }
-
-        console.log('Canvas thumbnail boyutu:', canvasThumbnail.length);
-        console.log('Block thumbnail boyutu:', blockThumbnail.length);
-
-        // Veriyi sunucuya gönder
-        sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail);
+    togglePreviewBtn.addEventListener('click', () => {
+        codePreviewPanel.classList.toggle('d-none');
+        updateCodePreview();
     });
 
-    // Veriyi sunucuya gönderen fonksiyon
-    function sendDataToServer(xmlText, projectName, canvasThumbnail, blockThumbnail) {
-        console.log('Veriler sunucuya gönderiliyor...');
-        console.log('Canvas thumbnail boyutu:', canvasThumbnail.length);
-        console.log('Block thumbnail boyutu:', blockThumbnail.length);
+    closePreviewBtn.addEventListener('click', () => {
+        codePreviewPanel.classList.add('d-none');
+    });
 
-        // Thumbnail'lerin varlığını kontrol et
-        if (!blockThumbnail || blockThumbnail.length < 100) {
-            console.warn('Block thumbnail oluşturulamadı veya çok küçük!');
+    // Workspace değişikliklerini dinle (Önizleme için)
+    setTimeout(() => {
+        Blockly.getMainWorkspace().addChangeListener((event) => {
+            if (event.isUiEvent) return;
+            updateCodePreview();
+        });
+    }, 1000);
+
+    // Dosya kaydetme işlemi
+    document.getElementById('saveFile').addEventListener('click', function () {
+        const workspace = Blockly.getMainWorkspace();
+
+        // Modern Serialization (JSON)
+        const state = Blockly.serialization.workspaces.save(workspace);
+        const stateText = JSON.stringify(state);
+
+        // Proje adını al
+        const projectName = document.getElementById('projectName').value.trim() || 'isimsiz';
+
+        // Thumbnail'ler için spinner başlatılabilir (Gelecek özellik)
+        const saveBtn = document.getElementById('saveFile');
+        const originalBtnContent = saveBtn.innerHTML;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Kaydediliyor...';
+        saveBtn.disabled = true;
+
+        // Canvas thumbnail (Saf JS ile)
+        const outputCanvas = document.getElementById('outputCanvas');
+        let canvasThumbnail = '';
+        try {
+            canvasThumbnail = outputCanvas.toDataURL('image/png', 0.8);
+        } catch (e) {
+            console.error('Canvas thumbnail hatası:', e);
         }
 
-        // Send the XML data to the server
+        // Block thumbnail (SVG capture)
+        captureBlockThumbnail().then(blockThumbnail => {
+            sendDataToServer(stateText, projectName, canvasThumbnail, blockThumbnail, () => {
+                saveBtn.innerHTML = originalBtnContent;
+                saveBtn.disabled = false;
+            });
+        });
+    });
+
+    async function captureBlockThumbnail() {
+        const workspace = Blockly.getMainWorkspace();
+        const svg = workspace.getParentSvg();
+
+        try {
+            // SVG'yi clone'la ve boyutlandır (Sadece blokların olduğu alan)
+            const clonedSvg = svg.cloneNode(true);
+            const bBox = workspace.getBlocksBoundingBox();
+
+            // Padding ekleyelim
+            const padding = 20;
+            const width = bBox.right - bBox.left + padding * 2;
+            const height = bBox.bottom - bBox.top + padding * 2;
+
+            clonedSvg.setAttribute('width', width);
+            clonedSvg.setAttribute('height', height);
+            clonedSvg.setAttribute('viewBox', `${bBox.left - padding} ${bBox.top - padding} ${width} ${height}`);
+
+            // Stilleri dahil et (CSS kopyalama)
+            const style = document.createElement('style');
+            style.textContent = Array.from(document.styleSheets)
+                .map(sheet => {
+                    try { return Array.from(sheet.cssRules).map(rule => rule.cssText).join(''); }
+                    catch (e) { return ''; }
+                }).join('');
+            clonedSvg.insertBefore(style, clonedSvg.firstChild);
+
+            const svgData = new XMLSerializer().serializeToString(clonedSvg);
+            const svgUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.min(width, 1000); // Çok büyükse sınırla
+                    canvas.height = Math.min(height, 1000);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = 'white'; // Şeffaf olmasın
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/png', 0.8));
+                };
+                img.onerror = () => resolve('');
+                img.src = svgUrl;
+            });
+        } catch (error) {
+            console.error('Blok thumbnail hatası:', error);
+            return '';
+        }
+    }
+
+    // Veriyi sunucuya gönderen fonksiyon
+    function sendDataToServer(blocksData, projectName, canvasThumbnail, blockThumbnail, callback) {
         fetch('/blockly/save/', {
             method: 'POST',
             headers: {
@@ -192,8 +184,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 'X-CSRFToken': getCookie('csrftoken')
             },
             body: JSON.stringify({
-                blocks: xmlText,
+                blocks: blocksData,
                 name: projectName,
+                project_id: window.currentProjectId, // ID'yi gönder (Varsa güncelleme yapacak)
                 canvas_thumbnail: canvasThumbnail,
                 block_thumbnail: blockThumbnail
             })
@@ -201,29 +194,43 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Proje başarıyla kaydedildi!');
-                    console.log('Proje ID:', data.project_id);
+                    window.currentProjectId = data.project_id; // ID'yi güncelle
+                    showToast('Başarı', 'Proje kaydedildi!', 'success');
                 } else {
-                    alert('Proje kaydedilirken bir hata oluştu: ' + data.error);
+                    showToast('Hata', 'Kayıt başarısız: ' + data.error, 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error saving project:', error);
-                alert('Proje kaydedilirken bir hata oluştu. Lütfen tekrar deneyin.');
+                showToast('Hata', 'Sunucu hatası oluştu.', 'danger');
+            })
+            .finally(() => {
+                if (callback) callback();
             });
+    }
+
+    // Basit bir toast/bildirim fonksiyonu (Eğer Bootstrap kullanılıyorsa modal yerine daha şık)
+    function showToast(title, message, type) {
+        // Şimdilik alert, ancak UI'a bir toast container eklenebilir
+        alert(title + ': ' + message);
     }
 
     // Yeni dosya oluşturma
     document.getElementById('newFile').addEventListener('click', function () {
         if (confirm('Yeni bir proje oluşturmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacaktır.')) {
-            // Workspace'i temizle
             Blockly.getMainWorkspace().clear();
-            // Dosya adını 'untitled' olarak ayarla
-            document.getElementById('projectName').value = 'untitled';
-            // Output canvas'ı temizle
+            document.getElementById('projectName').value = 'isimsiz';
+            window.currentProjectId = null; // ID'yi sıfırla
+
+            // Canvas temizle
             const canvas = document.getElementById('outputCanvas');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // URL'deki proje_id'yi temizle (Opsiyonel: refresh yapmadan)
+            const url = new URL(window.location);
+            url.searchParams.delete('project_id');
+            window.history.pushState({}, '', url);
         }
     });
 });

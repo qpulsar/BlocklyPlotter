@@ -2,31 +2,129 @@
 {% load static %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6 p-0">
-        <div id="blocklyArea">
-            <div id="blocklyDiv"></div>
+<div class="row g-0 flex-grow-1" style="height: calc(100vh - 56px);">
+    <!-- Sol Taraf: Blockly ve Toolbar -->
+    <div class="col-md-8 d-flex flex-column border-end position-relative">
+        <!-- Proje Yönetim Toolbar -->
+        <div
+            class="project-toolbar d-flex align-items-center justify-content-between p-2 bg-light border-bottom shadow-sm">
+            <div class="d-flex align-items-center flex-grow-1 me-3">
+                <i class="fas fa-file-alt text-primary me-2"></i>
+                <input type="text" id="projectName" class="form-control form-control-sm border-0 bg-transparent fw-bold"
+                    placeholder="Proje Adı..." value="isimsiz" style="font-size: 1.1rem; max-width: 300px;">
+            </div>
+            <div class="btn-group shadow-sm">
+                <button id="newFile" class="btn btn-outline-secondary btn-sm" title="Yeni Proje">
+                    <i class="fas fa-file"></i>
+                </button>
+                <button id="saveFile" class="btn btn-primary btn-sm px-3" title="Kaydet">
+                    <i class="fas fa-save me-1"></i> Kaydet
+                </button>
+            </div>
+            <div class="ms-3">
+                <button id="togglePreview" class="btn btn-outline-info btn-sm" title="Kod Önizleme (Alt+C)">
+                    <i class="fas fa-code"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Blockly Area -->
+        <div id="blocklyArea" class="flex-grow-1 w-100 position-relative">
+            <div id="blocklyDiv" class="position-absolute w-100 h-100"></div>
+        </div>
+
+        <!-- Kod Önizleme Paneli (Gizlenebilir) -->
+        <div id="codePreviewPanel" class="preview-panel d-none">
+            <div
+                class="preview-header d-flex justify-content-between align-items-center p-2 bg-dark text-white border-bottom border-secondary">
+                <span class="fw-bold small"><i class="fas fa-terminal me-2"></i>Üretilen Kod (JavaScript)</span>
+                <button id="closePreview" class="btn-close btn-close-white btn-sm" style="font-size: 0.6rem;"></button>
+            </div>
+            <div class="preview-content p-3 bg-dark text-light">
+                <pre id="generatedCode" class="m-0"
+                    style="font-family: 'Fira Code', 'Courier New', monospace; font-size: 0.85rem; line-height: 1.5; color: #53cff5;"></pre>
+            </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card mt-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Çıktı</span>
-                <div>
-                    <button id="runButton" class="btn btn-success btn-sm">
-                        <i class="fas fa-play"></i> Çalıştır
-                    </button>
-                    <button id="clearButton" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i> Temizle
-                    </button>
-                </div>
+
+    <!-- Sağ Taraf: Çıktı -->
+    <div class="col-md-4 d-flex flex-column bg-dark">
+        <div class="output-header d-flex justify-content-between align-items-center p-2 text-white border-bottom border-secondary"
+            style="background: #1a1a2e;">
+            <span class="fw-bold"><i class="fas fa-tv me-2 text-info"></i>Çıktı</span>
+            <div class="btn-group">
+                <button id="runButton" class="btn btn-success btn-sm">
+                    <i class="fas fa-play me-1"></i> Çalıştır
+                </button>
+                <button id="clearButton" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <div class="card-body text-center">
-                <canvas id="outputCanvas" width="600" height="600" class="border"></canvas>
-            </div>
+        </div>
+        <div class="output-body d-flex align-items-center justify-content-center p-3 flex-grow-1 overflow-auto bg-dark">
+            <canvas id="outputCanvas" width="600" height="600" class="canvas-shadow"></canvas>
         </div>
     </div>
 </div>
+
+<style>
+    body,
+    html {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .project-toolbar {
+        height: 60px;
+        z-index: 10;
+        background: #f8f9fa !important;
+    }
+
+    #projectName:focus {
+        outline: none;
+        box-shadow: none;
+        background: #fff !important;
+        border-bottom: 2px solid #0d6efd !important;
+        border-radius: 4px;
+    }
+
+    .canvas-shadow {
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        border: 2px solid #333;
+        border-radius: 8px;
+        background: white;
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    .preview-panel {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 35%;
+        z-index: 100;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .preview-content {
+        flex-grow: 1;
+        overflow: auto;
+    }
+
+    .preview-content pre {
+        white-space: pre-wrap;
+    }
+
+    /* Workspace ve Flyout Stilleri */
+    .blocklyTreeLabel {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        font-weight: 500 !important;
+    }
+</style>
 
 {% include 'partials/toolbox.html' %}
 {% endblock %}
@@ -54,4 +152,5 @@
 <script src="{% static 'js/canvas/physics-drawing-operations.js' %}"></script>
 <script src="{% static 'js/variable-watcher.js' %}"></script>
 <script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
 {% endblock %}

@@ -15,7 +15,8 @@ const messageListeners = {};
 let programRunning = true;
 
 // Çalışma zamanı değişkenleri
-let runtimeVariables = {};
+window.runtimeVariables = {};
+let runtimeVariables = window.runtimeVariables;
 
 // Canvas ve değişkenleri başlat
 function initCanvas() {
@@ -387,7 +388,7 @@ function getValueFromBlock(block, inputName) {
             return randomInt(1, 100);
 
         case 'variables_get':
-            var varName = targetBlock.getFieldValue('VAR');
+            var varName = targetBlock.getField('VAR').getText();
             return runtimeVariables[varName] !== undefined ? runtimeVariables[varName] : 0;
 
         case 'get_x':
@@ -802,14 +803,14 @@ async function executeBlock(block) {
             break;
 
         case 'variables_set':
-            var varName = block.getFieldValue('VAR');
+            var varName = block.getField('VAR').getText();
             var value = getValueFromBlock(block, 'VALUE');
             runtimeVariables[varName] = value;
             console.log(`Değişken ayarlandı: ${varName} = ${value}`);
             break;
 
-        case 'math_change':
-            var varName = block.getFieldValue('VAR');
+        case 'variables_change':
+            var varName = block.getField('VAR').getText();
             var delta = getValueFromBlock(block, 'DELTA') || 0;
             var currentVal = runtimeVariables[varName] !== undefined ? runtimeVariables[varName] : 0;
             runtimeVariables[varName] = currentVal + delta;

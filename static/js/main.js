@@ -1,6 +1,18 @@
 // Workspace'i oluştur
 var blocklyArea = document.getElementById('blocklyArea');
 var blocklyDiv = document.getElementById('blocklyDiv');
+
+// Deprecation uyarısını susturmak için monkey-patch (v12 fix)
+if (Blockly.Workspace.prototype.getAllVariables) {
+    const originalGetAllVariables = Blockly.Workspace.prototype.getAllVariables;
+    Blockly.Workspace.prototype.getAllVariables = function () {
+        if (this.getVariableMap) {
+            return this.getVariableMap().getAllVariables();
+        }
+        return originalGetAllVariables.apply(this, arguments);
+    };
+}
+
 var workspace = Blockly.inject('blocklyDiv', {
     toolbox: document.getElementById('toolbox').outerHTML,
     zoom: {
@@ -21,22 +33,9 @@ var workspace = Blockly.inject('blocklyDiv', {
 
 // Workspace boyutunu ayarla
 function onResize() {
-    // Compute the absolute coordinates and dimensions of blocklyArea.
-    var element = blocklyArea;
-    var x = 0;
-    var y = 0;
-    do {
-        x += element.offsetLeft;
-        y += element.offsetTop;
-        element = element.offsetParent;
-    } while (element);
-
-    // Position blocklyDiv over blocklyArea.
-    blocklyDiv.style.left = x + 'px';
-    blocklyDiv.style.top = y + 'px';
-    blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
-    blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-    Blockly.svgResize(workspace);
+    if (workspace) {
+        Blockly.svgResize(workspace);
+    }
 }
 
 // Run button click handler
@@ -50,7 +49,8 @@ if (runBtn) {
         var variables = workspace.getVariableMap().getAllVariables();
 
         // Runtime değişkenlerini sıfırla
-        runtimeVariables = {};
+        window.runtimeVariables = {};
+        runtimeVariables = window.runtimeVariables;
 
         // Aslında tüm blokları almak için:
         var allBlocks = workspace.getAllBlocks(true);
@@ -93,46 +93,23 @@ window.addEventListener('load', function () {
     // Pencere boyutu değiştiğinde workspace'i yeniden boyutlandır
     window.addEventListener('resize', onResize);
 
-    // URL'den proje ID'sini kontrol et
-    const urlParams = new URLSearchParams(window.location.search);
-    const projectId = urlParams.get('project_id');
-
-    if (projectId) {
-        // Eğer URL'de proje ID'si varsa, o projeyi yükle
-        // Not: Bu kısım navbar.js'de zaten yapılıyor, burada tekrar yapmaya gerek yok
-        console.log('URL üzerinden proje yükleniyor, ID:', projectId);
-    } else {
-        // Kullanıcının en son çalıştığı projeyi localStorage'dan kontrol et
-        const lastProjectXml = localStorage.getItem('lastProjectXml');
-
-        if (lastProjectXml) {
-            try {
-                // En son çalışılan projeyi yükle
-                console.log('En son çalışılan proje yükleniyor...');
-                // Blockly v12'de textToDom yerine DOMParser kullanılmalı
-                var parser = new DOMParser();
-                var xmlDoc = parser.parseFromString(lastProjectXml, "text/xml");
-                Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
-            } catch (error) {
-                console.error('En son çalışılan proje yüklenirken hata oluştu:', error);
-                // Hata durumunda minimal bir başlangıç bloğu yükle
-                loadMinimalStarterProject();
-            }
-        } else {
-            // Eğer localStorage'da kayıtlı proje yoksa, minimal bir başlangıç bloğu yükle
+    // Başlangıçta eğer workspace boşsa minimal starter yükle
+    // (navbar.js'deki yükleme bittikten kısa süre sonra kontrol et)
+    setTimeout(() => {
+        if (workspace.getAllBlocks(false).length === 0) {
             loadMinimalStarterProject();
         }
-    }
+    }, 500);
 
-    // Workspace değişikliklerini dinle ve son projeyi kaydet
+    // Workspace değişikliklerini dinle ve son projeyi (XML olarak, yedek amaçlı) localStorage'a kaydet
     workspace.addChangeListener(function (event) {
-        // Sadece blok ekleme, silme, taşıma veya değiştirme olaylarında kaydet
-        if (event.type === Blockly.Events.BLOCK_CREATE ||
-            event.type === Blockly.Events.BLOCK_DELETE ||
-            event.type === Blockly.Events.BLOCK_CHANGE ||
-            event.type === Blockly.Events.BLOCK_MOVE) {
+        if (event.isUiEvent) return;
 
-            // Workspace'i XML'e dönüştür ve localStorage'a kaydet
+        try {
+            const state = Blockly.serialization.workspaces.save(workspace);
+            localStorage.setItem('lastProjectState', JSON.stringify(state));
+        } catch (e) {
+            // Fallback to XML
             const xml = Blockly.Xml.workspaceToDom(workspace);
             const xmlText = Blockly.Xml.domToText(xml);
             localStorage.setItem('lastProjectXml', xmlText);
@@ -143,12 +120,18 @@ window.addEventListener('load', function () {
 // Minimal bir başlangıç projesi yükle (sadece when_flag_clicked bloğu)
 function loadMinimalStarterProject() {
     console.log('Minimal başlangıç projesi yükleniyor...');
-    var minimalBlocks = `
-<xml xmlns="https://developers.google.com/blockly/xml">
-  <block type="when_flag_clicked" id="start" x="20" y="20"></block>
-</xml>`;
-
-    var parser = new DOMParser();
-    var xmlDoc = parser.parseFromString(minimalBlocks, "text/xml");
-    Blockly.Xml.domToWorkspace(xmlDoc.documentElement, workspace);
+    const state = {
+        "blocks": {
+            "languageVersion": 0,
+            "blocks": [
+                {
+                    "type": "when_flag_clicked",
+                    "id": "start",
+                    "x": 40,
+                    "y": 40
+                }
+            ]
+        }
+    };
+    Blockly.serialization.workspaces.load(state, workspace);
 }
