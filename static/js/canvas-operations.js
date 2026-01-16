@@ -376,6 +376,20 @@ function getValueFromBlock(block, inputName) {
             var b = getValueFromBlock(targetBlock, 'B') || 0;
             return b !== 0 ? a % b : 0;
 
+        // Blockly standart aritmetik bloğu (dropdown ile işlem seçimi)
+        case 'math_arithmetic':
+            var a = getValueFromBlock(targetBlock, 'A') || 0;
+            var b = getValueFromBlock(targetBlock, 'B') || 0;
+            var op = targetBlock.getFieldValue('OP');
+            switch (op) {
+                case 'ADD': return a + b;
+                case 'MINUS': return a - b;
+                case 'MULTIPLY': return a * b;
+                case 'DIVIDE': return b !== 0 ? a / b : 0;
+                case 'POWER': return Math.pow(a, b);
+                default: return 0;
+            }
+
         case 'math_round':
             var num = getValueFromBlock(targetBlock, 'NUM') || 0;
             return Math.round(num);
@@ -515,6 +529,29 @@ function getValueFromBlock(block, inputName) {
             return typeof calculateProjectileFlightTime === 'function'
                 ? calculateProjectileFlightTime(velocity, angle) : 0;
 
+        // ZAMAN VE ALGILAMA BLOKLARI
+        case 'timer':
+            return timer();
+
+        case 'current_hour':
+            return currentHour();
+
+        case 'current_minute':
+            return currentMinute();
+
+        case 'current_second':
+            return currentSecond();
+
+        // METİN BLOKLARI
+        case 'text_join':
+            var a = getValueFromBlock(targetBlock, 'A') || '';
+            var b = getValueFromBlock(targetBlock, 'B') || '';
+            return String(a) + String(b);
+
+        // MANTIK BLOKLARI
+        case 'logic_null':
+            return null;
+
         default:
             console.warn('Değer alınamadı, bilinmeyen blok tipi:', targetBlock.type);
             return null;
@@ -535,57 +572,23 @@ async function executeBlock(block) {
             break;
 
         case 'move_steps':
-            var input = block.getInput('STEPS');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var steps = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    moveSteps(steps);
-                }
-            }
+            var steps = getValueFromBlock(block, 'STEPS') || 0;
+            moveSteps(steps);
             break;
 
         case 'turn_right':
-            var input = block.getInput('ANGLE');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var angle = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    turnRight(angle);
-                }
-            }
+            var angle = getValueFromBlock(block, 'ANGLE') || 0;
+            turnRight(angle);
             break;
 
         case 'turn_left':
-            var input = block.getInput('ANGLE');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var angle = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    turnLeft(angle);
-                }
-            }
+            var angle = getValueFromBlock(block, 'ANGLE') || 0;
+            turnLeft(angle);
             break;
 
         case 'goto_xy':
-            var xInput = block.getInput('X');
-            var yInput = block.getInput('Y');
-            var x = 0, y = 0;
-
-            if (xInput && xInput.connection && xInput.connection.targetBlock()) {
-                var xBlock = xInput.connection.targetBlock();
-                if (xBlock.type === 'math_number') {
-                    x = parseInt(xBlock.getFieldValue('NUM'), 10) || 0;
-                }
-            }
-
-            if (yInput && yInput.connection && yInput.connection.targetBlock()) {
-                var yBlock = yInput.connection.targetBlock();
-                if (yBlock.type === 'math_number') {
-                    y = parseInt(yBlock.getFieldValue('NUM'), 10) || 0;
-                }
-            }
-
+            var x = getValueFromBlock(block, 'X') || 0;
+            var y = getValueFromBlock(block, 'Y') || 0;
             gotoXY(x, y);
             break;
 
@@ -594,73 +597,33 @@ async function executeBlock(block) {
             break;
 
         case 'set_direction':
-            var input = block.getInput('ANGLE');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var angle = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    setDirection(-angle);
-                }
-            }
+            var angle = getValueFromBlock(block, 'ANGLE') || 0;
+            setDirection(-angle);
             break;
 
         case 'change_x':
-            var input = block.getInput('DX');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var dx = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    changeX(dx);
-                }
-            }
+            var dx = getValueFromBlock(block, 'DX') || 0;
+            changeX(dx);
             break;
 
         case 'change_y':
-            var input = block.getInput('DY');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var dy = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    changeY(dy);
-                }
-            }
+            var dy = getValueFromBlock(block, 'DY') || 0;
+            changeY(dy);
             break;
 
         case 'set_x':
-            var input = block.getInput('X');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var x = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    setX(x);
-                }
-            }
+            var x = getValueFromBlock(block, 'X') || 0;
+            setX(x);
             break;
 
         case 'set_y':
-            var input = block.getInput('Y');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var y = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    setY(y);
-                }
-            }
+            var y = getValueFromBlock(block, 'Y') || 0;
+            setY(y);
             break;
 
         case 'repeat_times':
-            var input = block.getInput('TIMES');
-            if (input && input.connection && input.connection.targetBlock()) {
-                var numberBlock = input.connection.targetBlock();
-                if (numberBlock.type === 'math_number') {
-                    var times = parseInt(numberBlock.getFieldValue('NUM'), 10) || 0;
-                    await repeat_times(times, block.id);
-                } else {
-                    console.warn("Bağlı blok math_number değil:", numberBlock.type);
-                }
-            } else {
-                console.warn("TIMES girişine bağlı blok bulunamadı.");
-            }
+            var times = getValueFromBlock(block, 'TIMES') || 0;
+            await repeat_times(times, block.id);
             break;
 
         case 'forever':
@@ -807,6 +770,10 @@ async function executeBlock(block) {
             var value = getValueFromBlock(block, 'VALUE');
             runtimeVariables[varName] = value;
             console.log(`Değişken ayarlandı: ${varName} = ${value}`);
+            // Değişikliği bildir
+            document.dispatchEvent(new CustomEvent('blockly-variable-changed', {
+                detail: { name: varName, value: value }
+            }));
             break;
 
         case 'variables_change':
@@ -815,6 +782,10 @@ async function executeBlock(block) {
             var currentVal = runtimeVariables[varName] !== undefined ? runtimeVariables[varName] : 0;
             runtimeVariables[varName] = currentVal + delta;
             console.log(`Değişken değişti: ${varName} (${currentVal}) += ${delta} => ${runtimeVariables[varName]}`);
+            // Değişikliği bildir
+            document.dispatchEvent(new CustomEvent('blockly-variable-changed', {
+                detail: { name: varName, value: runtimeVariables[varName] }
+            }));
             break;
 
         case 'stop':
@@ -942,6 +913,27 @@ async function executeBlock(block) {
             var startX = getValueFromBlock(block, 'START_X') || -200;
             var centerY = getValueFromBlock(block, 'CENTER_Y') || 0;
             drawHarmonicMotion(amplitude, periods, startX, centerY);
+            break;
+
+        // ============================================
+        // EKSİK BLOKLAR - YENİ EKLENEN
+        // ============================================
+        case 'bounce_on_edge':
+            bounceOnEdge();
+            break;
+
+        case 'wait_seconds':
+            var seconds = getValueFromBlock(block, 'SECONDS') || 1;
+            await waitSeconds(seconds);
+            break;
+
+        case 'broadcast':
+            var message = block.getFieldValue('MESSAGE');
+            broadcast(message);
+            break;
+
+        case 'reset_timer':
+            resetTimer();
             break;
 
         default:
