@@ -18,6 +18,9 @@ class BlocklyProject(models.Model):
     canvas_thumbnail_base64 = models.TextField(blank=True, null=True, help_text="Base64 encoded thumbnail of the canvas")
     block_thumbnail_base64 = models.TextField(blank=True, null=True, help_text="Base64 encoded thumbnail of the blocks")
     
+    # İzlenen değişkenler listesi (JSON string)
+    watched_variables = models.TextField(default='[]', help_text="List of variables being watched")
+    
     is_public = models.BooleanField(default=False, help_text="Is the project public?")
 
     def __str__(self):

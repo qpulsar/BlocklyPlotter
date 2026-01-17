@@ -1082,35 +1082,35 @@ Blockly.JavaScript.forBlock['math_abs'] = function (block) {
 
 Blockly.JavaScript.forBlock['variables_set'] = function (block) {
     var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
-    var varName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+    var varName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
     return varName + ' = ' + value + ';\n';
 };
 
 Blockly.JavaScript.forBlock['variables_change'] = function (block) {
     var delta = Blockly.JavaScript.valueToCode(block, 'DELTA', Blockly.JavaScript.ORDER_ADDITION) || '0';
-    var varName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
+    var varName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('VAR'), Blockly.Variables.NAME_TYPE);
     return varName + ' += ' + delta + ';\n';
 };
 
 Blockly.JavaScript.forBlock['lists_create'] = function (block) {
-    var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
+    var listName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + ' = [];\n';
 };
 
 Blockly.JavaScript.forBlock['lists_add'] = function (block) {
     var item = Blockly.JavaScript.valueToCode(block, 'ITEM', Blockly.JavaScript.ORDER_NONE) || 'null';
-    var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
+    var listName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.push(' + item + ');\n';
 };
 
 Blockly.JavaScript.forBlock['lists_delete'] = function (block) {
     var index = Blockly.JavaScript.valueToCode(block, 'INDEX', Blockly.JavaScript.ORDER_NONE) || '0';
-    var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
+    var listName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.splice(' + index + ', 1);\n';
 };
 
 Blockly.JavaScript.forBlock['lists_clear'] = function (block) {
-    var listName = Blockly.JavaScript.variableDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
+    var listName = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('LIST'), Blockly.Variables.NAME_TYPE);
     return listName + '.length = 0;\n';
 };
 
@@ -1175,6 +1175,24 @@ Blockly.JavaScript.forBlock['comparison_block'] = function (block) {
     }
 
     return [code, Blockly.JavaScript.ORDER_RELATIONAL];
+};
+
+Blockly.JavaScript.forBlock['controls_whileUntil'] = function (block) {
+    var until = block.getFieldValue('MODE') == 'UNTIL';
+    var argument0 = Blockly.JavaScript.valueToCode(block, 'BOOL',
+        until ? Blockly.JavaScript.ORDER_LOGICAL_NOT :
+            Blockly.JavaScript.ORDER_NONE) || 'false';
+    var branch = Blockly.JavaScript.statementToCode(block, 'DO');
+    if (until) {
+        argument0 = '!' + argument0;
+    }
+    return 'while (' + argument0 + ') {\n' + branch + '}\n';
+};
+
+Blockly.JavaScript.forBlock['variables_get'] = function (block) {
+    var code = Blockly.JavaScript.nameDB_.getName(block.getFieldValue('VAR'),
+        Blockly.Variables.NAME_TYPE);
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 // Blockly temel yapılandırması

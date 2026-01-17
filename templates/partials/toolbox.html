@@ -303,8 +303,11 @@
         </block>
         <block type="forever"></block>
         <block type="repeat_until"></block>
-        <block type="if"></block>
-        <block type="if_else"></block>
+        <block type="repeat_until"></block>
+        <block type="controls_if"></block>
+        <block type="controls_if">
+            <mutation else="1"></mutation>
+        </block>
         <block type="stop"></block>
         <block type="wait_seconds">
             <value name="SECONDS">
@@ -347,47 +350,110 @@
             </value>
         </block>
 
-        <block type="math_modulo"></block>
+        <block type="math_modulo">
+            <value name="A">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">3</field>
+                </shadow>
+            </value>
+        </block>
 
         <!-- Yuvarlama -->
-        <block type="math_round"></block>
-        <block type="math_floor"></block>
-        <block type="math_ceil"></block>
-        <block type="math_abs"></block>
+        <block type="math_round">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">3.14</field>
+                </shadow>
+            </value>
+        </block>
+
+        <!-- Gelişmiş Tek Parametreli -->
+        <block type="math_single">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">9</field>
+                </shadow>
+            </value>
+        </block>
+
+        <!-- Trigonometri -->
+        <block type="math_trig">
+            <value name="NUM">
+                <shadow type="math_number">
+                    <field name="NUM">45</field>
+                </shadow>
+            </value>
+        </block>
+
+        <!-- Üs Alma (İki parametreli olduğu için ayrı tutuldu) -->
+        <block type="math_pow">
+            <value name="BASE">
+                <shadow type="math_number">
+                    <field name="NUM">2</field>
+                </shadow>
+            </value>
+            <value name="EXPONENT">
+                <shadow type="math_number">
+                    <field name="NUM">3</field>
+                </shadow>
+            </value>
+        </block>
 
         <!-- Rastgele -->
         <block type="random_int"></block>
         <block type="random_range"></block>
 
         <!-- Min/Max -->
-        <block type="math_min"></block>
-        <block type="math_max"></block>
+        <block type="math_min">
+            <value name="A">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_max">
+            <value name="A">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
 
         <!-- Sabitler -->
         <block type="math_pi"></block>
         <block type="math_e"></block>
         <block type="math_phi"></block>
 
-        <!-- Üs ve Kök -->
-        <block type="math_square"></block>
-        <block type="math_sqrt"></block>
-        <block type="math_pow"></block>
-
-        <!-- Logaritma -->
-        <block type="math_log10"></block>
-        <block type="math_ln"></block>
-
-        <!-- Trigonometri -->
-        <block type="math_sin"></block>
-        <block type="math_cos"></block>
-        <block type="math_tan"></block>
-        <block type="math_asin"></block>
-        <block type="math_acos"></block>
-        <block type="math_atan"></block>
-
         <!-- Açı Dönüşümü -->
-        <block type="math_to_radians"></block>
-        <block type="math_to_degrees"></block>
+        <block type="math_to_radians">
+            <value name="DEGREES">
+                <shadow type="math_number">
+                    <field name="NUM">180</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="math_to_degrees">
+            <value name="RADIANS">
+                <shadow type="math_number">
+                    <field name="NUM">3.14</field>
+                </shadow>
+            </value>
+        </block>
     </category>
 
     <!-- Metin Kategorisi -->
@@ -401,8 +467,7 @@
     <!-- Mantık Kategorisi -->
     <category name="Mantık" colour="#5CB1D6">
         <block type="comparison_block"></block>
-        <block type="logic_and"></block>
-        <block type="logic_or"></block>
+        <block type="logic_operation"></block>
         <block type="logic_boolean"></block>
         <block type="logic_null"></block>
     </category>

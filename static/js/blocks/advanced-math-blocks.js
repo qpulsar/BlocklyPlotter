@@ -7,142 +7,26 @@
 // TRİGONOMETRİK FONKSİYONLAR
 // =====================================================
 
-/**
- * Sinüs fonksiyonu (derece cinsinden)
- */
-Blockly.Blocks['math_sin'] = {
+// =====================================================
+// TRİGONOMETRİK FONKSİYONLAR
+// =====================================================
+
+Blockly.Blocks['math_trig'] = {
     init: function () {
-        this.appendValueInput("ANGLE")
+        this.appendValueInput("NUM")
             .setCheck("Number")
-            .appendField("sin");
+            .appendField(new Blockly.FieldDropdown([
+                ["sin", "SIN"],
+                ["cos", "COS"],
+                ["tan", "TAN"],
+                ["arcsin", "ASIN"],
+                ["arccos", "ACOS"],
+                ["arctan", "ATAN"]
+            ]), "OP");
         this.setOutput(true, "Number");
         this.setColour(230);
-        this.setTooltip("Açının sinüsünü hesaplar (derece cinsinden)");
+        this.setTooltip("Trigonometrik fonksiyonlar (Derece cinsinden)");
         this.setHelpUrl("");
-
-        // Shadow blok ekle
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '45';
-        shadow.appendChild(field);
-        this.getInput('ANGLE').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Kosinüs fonksiyonu (derece cinsinden)
- */
-Blockly.Blocks['math_cos'] = {
-    init: function () {
-        this.appendValueInput("ANGLE")
-            .setCheck("Number")
-            .appendField("cos");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Açının kosinüsünü hesaplar (derece cinsinden)");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '45';
-        shadow.appendChild(field);
-        this.getInput('ANGLE').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Tanjant fonksiyonu (derece cinsinden)
- */
-Blockly.Blocks['math_tan'] = {
-    init: function () {
-        this.appendValueInput("ANGLE")
-            .setCheck("Number")
-            .appendField("tan");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Açının tanjantını hesaplar (derece cinsinden)");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '45';
-        shadow.appendChild(field);
-        this.getInput('ANGLE').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Ark sinüs fonksiyonu (sonuç derece cinsinden)
- */
-Blockly.Blocks['math_asin'] = {
-    init: function () {
-        this.appendValueInput("VALUE")
-            .setCheck("Number")
-            .appendField("arcsin");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Değerin ark sinüsünü hesaplar (sonuç derece cinsinden)");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '0.5';
-        shadow.appendChild(field);
-        this.getInput('VALUE').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Ark kosinüs fonksiyonu (sonuç derece cinsinden)
- */
-Blockly.Blocks['math_acos'] = {
-    init: function () {
-        this.appendValueInput("VALUE")
-            .setCheck("Number")
-            .appendField("arccos");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Değerin ark kosinüsünü hesaplar (sonuç derece cinsinden)");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '0.5';
-        shadow.appendChild(field);
-        this.getInput('VALUE').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Ark tanjant fonksiyonu (sonuç derece cinsinden)
- */
-Blockly.Blocks['math_atan'] = {
-    init: function () {
-        this.appendValueInput("VALUE")
-            .setCheck("Number")
-            .appendField("arctan");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Değerin ark tanjantını hesaplar (sonuç derece cinsinden)");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '1';
-        shadow.appendChild(field);
-        this.getInput('VALUE').connection.setShadowDom(shadow);
     }
 };
 
@@ -150,32 +34,31 @@ Blockly.Blocks['math_atan'] = {
 // KÖK VE ÜS FONKSİYONLARI
 // =====================================================
 
-/**
- * Karekök fonksiyonu
- */
-Blockly.Blocks['math_sqrt'] = {
+// =====================================================
+// TEK PARAMETRELİ MATEMATİK FONKSİYONLARI (Kök, Üs, Logaritma vb.)
+// =====================================================
+
+Blockly.Blocks['math_single'] = {
     init: function () {
         this.appendValueInput("NUM")
             .setCheck("Number")
-            .appendField("√");
+            .appendField(new Blockly.FieldDropdown([
+                ["√", "ROOT"],
+                ["²", "SQUARE"],
+                ["mutlak", "ABS"],
+                ["-", "NEG"],
+                ["ln", "LN"],
+                ["log10", "LOG10"],
+                ["e^", "EXP"],
+                ["10^", "POW10"]
+            ]), "OP");
         this.setOutput(true, "Number");
         this.setColour(230);
-        this.setTooltip("Sayının karekökünü hesaplar");
+        this.setTooltip("Gelişmiş tek parametreli matematik fonksiyonları");
         this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '16';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
     }
 };
 
-/**
- * Üs alma fonksiyonu (a^b)
- */
 Blockly.Blocks['math_pow'] = {
     init: function () {
         this.appendValueInput("BASE")
@@ -188,98 +71,6 @@ Blockly.Blocks['math_pow'] = {
         this.setColour(230);
         this.setTooltip("Tabanın üssünü hesaplar (taban^üs)");
         this.setHelpUrl("");
-
-        // Shadow blokları ekle
-        const baseShadow = Blockly.utils.xml.createElement('shadow');
-        baseShadow.setAttribute('type', 'math_number');
-        const baseField = Blockly.utils.xml.createElement('field');
-        baseField.setAttribute('name', 'NUM');
-        baseField.textContent = '2';
-        baseShadow.appendChild(baseField);
-        this.getInput('BASE').connection.setShadowDom(baseShadow);
-
-        const expShadow = Blockly.utils.xml.createElement('shadow');
-        expShadow.setAttribute('type', 'math_number');
-        const expField = Blockly.utils.xml.createElement('field');
-        expField.setAttribute('name', 'NUM');
-        expField.textContent = '3';
-        expShadow.appendChild(expField);
-        this.getInput('EXPONENT').connection.setShadowDom(expShadow);
-    }
-};
-
-/**
- * Kare alma fonksiyonu (x²)
- */
-Blockly.Blocks['math_square'] = {
-    init: function () {
-        this.appendValueInput("NUM")
-            .setCheck("Number");
-        this.appendDummyInput()
-            .appendField("²");
-        this.setInputsInline(true);
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Sayının karesini hesaplar");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '5';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
-    }
-};
-
-// =====================================================
-// LOGARİTMA FONKSİYONLARI
-// =====================================================
-
-/**
- * Logaritma (10 tabanında)
- */
-Blockly.Blocks['math_log10'] = {
-    init: function () {
-        this.appendValueInput("NUM")
-            .setCheck("Number")
-            .appendField("log₁₀");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("10 tabanında logaritma hesaplar");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '100';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Doğal logaritma (e tabanında)
- */
-Blockly.Blocks['math_ln'] = {
-    init: function () {
-        this.appendValueInput("NUM")
-            .setCheck("Number")
-            .appendField("ln");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Doğal logaritma (e tabanında) hesaplar");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '10';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
     }
 };
 
@@ -371,51 +162,7 @@ Blockly.Blocks['random_range'] = {
     }
 };
 
-/**
- * Taban fonksiyonu (floor)
- */
-Blockly.Blocks['math_floor'] = {
-    init: function () {
-        this.appendValueInput("NUM")
-            .setCheck("Number")
-            .appendField("taban");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Sayıyı aşağı yuvarlar");
-        this.setHelpUrl("");
 
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '3.7';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
-    }
-};
-
-/**
- * Tavan fonksiyonu (ceil)
- */
-Blockly.Blocks['math_ceil'] = {
-    init: function () {
-        this.appendValueInput("NUM")
-            .setCheck("Number")
-            .appendField("tavan");
-        this.setOutput(true, "Number");
-        this.setColour(230);
-        this.setTooltip("Sayıyı yukarı yuvarlar");
-        this.setHelpUrl("");
-
-        const shadow = Blockly.utils.xml.createElement('shadow');
-        shadow.setAttribute('type', 'math_number');
-        const field = Blockly.utils.xml.createElement('field');
-        field.setAttribute('name', 'NUM');
-        field.textContent = '3.2';
-        shadow.appendChild(field);
-        this.getInput('NUM').connection.setShadowDom(shadow);
-    }
-};
 
 /**
  * Minimum fonksiyonu
@@ -507,63 +254,42 @@ Blockly.Blocks['math_to_degrees'] = {
 // JAVASCRIPT GENERATORS
 // =====================================================
 
-// Trigonometrik fonksiyonlar
-Blockly.JavaScript.forBlock['math_sin'] = function (block) {
-    var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.sin((' + angle + ') * Math.PI / 180)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+Blockly.JavaScript.forBlock['math_trig'] = function (block) {
+    var op = block.getFieldValue('OP');
+    var arg = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    var code = '';
+    switch (op) {
+        case 'SIN': code = 'Math.sin((' + arg + ') * Math.PI / 180)'; break;
+        case 'COS': code = 'Math.cos((' + arg + ') * Math.PI / 180)'; break;
+        case 'TAN': code = 'Math.tan((' + arg + ') * Math.PI / 180)'; break;
+        case 'ASIN': code = '(Math.asin(' + arg + ') * 180 / Math.PI)'; break;
+        case 'ACOS': code = '(Math.acos(' + arg + ') * 180 / Math.PI)'; break;
+        case 'ATAN': code = '(Math.atan(' + arg + ') * 180 / Math.PI)'; break;
+    }
+    return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript.forBlock['math_cos'] = function (block) {
-    var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.cos((' + angle + ') * Math.PI / 180)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_tan'] = function (block) {
-    var angle = Blockly.JavaScript.valueToCode(block, 'ANGLE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.tan((' + angle + ') * Math.PI / 180)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_asin'] = function (block) {
-    var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['(Math.asin(' + value + ') * 180 / Math.PI)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_acos'] = function (block) {
-    var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['(Math.acos(' + value + ') * 180 / Math.PI)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_atan'] = function (block) {
-    var value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['(Math.atan(' + value + ') * 180 / Math.PI)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-// Kök ve üs fonksiyonları
-Blockly.JavaScript.forBlock['math_sqrt'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.sqrt(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
+Blockly.JavaScript.forBlock['math_single'] = function (block) {
+    var op = block.getFieldValue('OP');
+    var arg = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
+    var code = '';
+    switch (op) {
+        case 'ROOT': code = 'Math.sqrt(' + arg + ')'; break;
+        case 'ABS': code = 'Math.abs(' + arg + ')'; break;
+        case 'NEG': code = '-' + arg; break;
+        case 'LN': code = 'Math.log(' + arg + ')'; break;
+        case 'LOG10': code = 'Math.log10(' + arg + ')'; break;
+        case 'EXP': code = 'Math.exp(' + arg + ')'; break;
+        case 'POW10': code = 'Math.pow(10,' + arg + ')'; break;
+        case 'SQUARE': code = 'Math.pow(' + arg + ', 2)'; break;
+    }
+    return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
 Blockly.JavaScript.forBlock['math_pow'] = function (block) {
     var base = Blockly.JavaScript.valueToCode(block, 'BASE', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     var exp = Blockly.JavaScript.valueToCode(block, 'EXPONENT', Blockly.JavaScript.ORDER_ATOMIC) || '0';
     return ['Math.pow(' + base + ', ' + exp + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_square'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.pow(' + num + ', 2)', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-// Logaritma fonksiyonları
-Blockly.JavaScript.forBlock['math_log10'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '1';
-    return ['Math.log10(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
-
-Blockly.JavaScript.forBlock['math_ln'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '1';
-    return ['Math.log(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
 // Sabitler
@@ -586,15 +312,7 @@ Blockly.JavaScript.forBlock['random_range'] = function (block) {
     return ['randomInt(' + min + ', ' + max + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
-Blockly.JavaScript.forBlock['math_floor'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.floor(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
 
-Blockly.JavaScript.forBlock['math_ceil'] = function (block) {
-    var num = Blockly.JavaScript.valueToCode(block, 'NUM', Blockly.JavaScript.ORDER_ATOMIC) || '0';
-    return ['Math.ceil(' + num + ')', Blockly.JavaScript.ORDER_FUNCTION_CALL];
-};
 
 Blockly.JavaScript.forBlock['math_min'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '0';

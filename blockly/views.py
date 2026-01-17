@@ -179,6 +179,12 @@ def save_workspace(request):
             except Exception as e:
                 logger.error(f"Block thumbnail dosya olarak kaydedilemedi: {str(e)}")
         
+        # watched_variables verisini al
+        watched_variables = data.get('watched_variables')
+        if watched_variables:
+             # Liste ise JSON stringe çevir, string ise olduğu gibi al
+            project.watched_variables = json.dumps(watched_variables) if isinstance(watched_variables, list) else watched_variables
+        
         # Projeyi kaydet
         project.save()
         
@@ -370,6 +376,13 @@ def get_project_info(request, project_id):
         if request.user.is_authenticated and project.user != request.user and not getattr(project, 'is_public', False):
             return JsonResponse({'success': False, 'error': 'Bu projeye erişim izniniz yok.'}, status=403)
         
+        watched_variables = []
+        try:
+           if hasattr(project, 'watched_variables') and project.watched_variables:
+               watched_variables = json.loads(project.watched_variables)
+        except:
+           pass
+
         return JsonResponse({
             'success': True,
             'project_id': project.id,
@@ -378,7 +391,8 @@ def get_project_info(request, project_id):
             'created_at': project.created_at,
             'updated_at': project.updated_at,
             'is_public': getattr(project, 'is_public', False),
-            'xml_data': project.block_data  # XML verisini ekle
+            'xml_data': project.block_data,  # XML verisini ekle
+            'watched_variables': watched_variables # İzlenen değişkenleri ekle
         }, encoder=DjangoJSONEncoder)
     except Exception as e:
         logger.error(f"Proje bilgileri alınırken hata oluştu: {str(e)}")

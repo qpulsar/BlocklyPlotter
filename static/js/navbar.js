@@ -52,6 +52,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                     console.log('Proje XML verisi yüklendi (fallback)');
                                 }
 
+                                // Değişken izleme listesini geri yükle
+                                if (data.watched_variables && window.setWatchedVariables) {
+                                    window.setWatchedVariables(data.watched_variables);
+                                }
+
                                 // Yükleme sonrası kod üret
                                 updateCodePreview();
                             } catch (error) {
@@ -188,13 +193,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 name: projectName,
                 project_id: window.currentProjectId, // ID'yi gönder (Varsa güncelleme yapacak)
                 canvas_thumbnail: canvasThumbnail,
-                block_thumbnail: blockThumbnail
+                block_thumbnail: blockThumbnail,
+                watched_variables: window.getWatchedVariables ? window.getWatchedVariables() : []
             })
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     window.currentProjectId = data.project_id; // ID'yi güncelle
+
+                    // URL'i güncelle
+                    const url = new URL(window.location);
+                    url.searchParams.set('project_id', data.project_id);
+                    window.history.pushState({}, '', url);
+
                     showToast('Başarı', 'Proje kaydedildi!', 'success');
                 } else {
                     showToast('Hata', 'Kayıt başarısız: ' + data.error, 'danger');

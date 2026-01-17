@@ -216,9 +216,22 @@ function clearCanvas() {
 }
 
 function gotoXY(x, y) {
+    // Önceki konumu kaydet
+    const oldX = penPosition.x;
+    const oldY = penPosition.y;
+
+    // Yeni koordinatlara git
     const canvasCoords = toCanvasCoords(x, y);
     penPosition.x = canvasCoords.x;
     penPosition.y = canvasCoords.y;
+
+    // Hareketi kaydet (kalem durumu ile birlikte)
+    drawings.push({
+        from: { x: oldX, y: oldY },
+        to: { x: penPosition.x, y: penPosition.y },
+        penDown: penDown
+    });
+
     updateCanvas();
 }
 
@@ -285,7 +298,7 @@ function evaluateCondition(block) {
 
     switch (block.type) {
         case 'comparison_block':
-            var opField = block.getFieldValue('OP');
+            var opField = block.getFieldValue('OPERATOR');
             var a = getValueFromBlock(block, 'A');
             var b = getValueFromBlock(block, 'B');
 
@@ -294,6 +307,24 @@ function evaluateCondition(block) {
             switch (opField) {
                 case 'EQ': return a === b;
                 case 'NEQ': return a !== b;
+                case 'GT': return a > b;
+                case 'GTE': return a >= b;
+                case 'LT': return a < b;
+                case 'LTE': return a <= b;
+                default: return false;
+            }
+
+        case 'logic_compare':
+            // Blockly standart karşılaştırma bloğu (OP field kullanır)
+            var opField = block.getFieldValue('OP');
+            var a = getValueFromBlock(block, 'A');
+            var b = getValueFromBlock(block, 'B');
+
+            console.log('logic_compare:', a, opField, b);
+
+            switch (opField) {
+                case 'EQ': return a == b;
+                case 'NEQ': return a != b;
                 case 'GT': return a > b;
                 case 'GTE': return a >= b;
                 case 'LT': return a < b;
@@ -499,6 +530,19 @@ function getValueFromBlock(block, inputName) {
         case 'math_to_degrees':
             var radians = getValueFromBlock(targetBlock, 'RADIANS') || 0;
             return radians * 180 / Math.PI;
+
+        case 'math_trig':
+            var op = targetBlock.getFieldValue('OP');
+            var num = getValueFromBlock(targetBlock, 'NUM') || 0;
+            switch (op) {
+                case 'SIN': return Math.sin(num * Math.PI / 180);
+                case 'COS': return Math.cos(num * Math.PI / 180);
+                case 'TAN': return Math.tan(num * Math.PI / 180);
+                case 'ASIN': return Math.asin(num) * 180 / Math.PI;
+                case 'ACOS': return Math.acos(num) * 180 / Math.PI;
+                case 'ATAN': return Math.atan(num) * 180 / Math.PI;
+                default: return 0;
+            }
 
         // KALEM BLOKLARI
         case 'get_pen_color':
@@ -761,6 +805,30 @@ async function executeBlock(block) {
                         await executeBlock(statementBlock);
                         statementBlock = statementBlock.getNextBlock();
                     }
+                }
+            }
+            break;
+
+        case 'controls_whileUntil':
+            // While/Until döngüsü
+            var mode = block.getFieldValue('MODE');
+            var conditionInput = block.getInput('BOOL');
+            if (conditionInput && conditionInput.connection && conditionInput.connection.targetBlock()) {
+                var conditionBlock = conditionInput.connection.targetBlock();
+                var shouldRepeat = function () {
+                    var val = evaluateCondition(conditionBlock);
+                    return mode === 'UNTIL' ? !val : val;
+                };
+
+                while (shouldRepeat()) {
+                    var statementBlock = block.getInput('DO').connection.targetBlock();
+                    while (statementBlock) {
+                        var result = await executeBlock(statementBlock);
+                        if (result === true) return; // Break loop
+                        statementBlock = statementBlock.getNextBlock();
+                    }
+                    // Safety delay
+                    await new Promise(resolve => setTimeout(resolve, 0));
                 }
             }
             break;

@@ -645,6 +645,43 @@ function hideVariableWatcher() {
 }
 
 // =====================================================
+// GLOBAL ERİŞİM (Proje Kaydı İçin)
+// =====================================================
+
+/**
+ * İzlenen değişkenlerin listesini döndürür (Array olarak)
+ */
+window.getWatchedVariables = function () {
+    return Array.from(watchedVariables);
+};
+
+/**
+ * İzlenen değişkenleri ayarlar
+ * @param {Array} variables - Değişken isimleri listesi
+ */
+window.setWatchedVariables = function (variables) {
+    if (!Array.isArray(variables)) {
+        console.warn('setWatchedVariables: Liste bekleniyor', variables);
+        return;
+    }
+
+    watchedVariables.clear();
+    variables.forEach(v => watchedVariables.add(v));
+
+    // UI oluşturulmamış olabilir, kontrol et
+    if (document.getElementById('variableWatcher')) {
+        updateWatcherDisplay();
+
+        // Eğer liste doluysa paneli göster
+        if (variables.length > 0 && document.getElementById('variableWatcher').style.display === 'none') {
+            document.getElementById('variableWatcher').style.display = 'block';
+            variableWatcherVisible = true;
+            startWatcherUpdates();
+        }
+    }
+};
+
+// =====================================================
 // BAŞLATMA
 // =====================================================
 
