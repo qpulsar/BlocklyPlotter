@@ -21,6 +21,15 @@
                     <i class="fas fa-save me-1"></i> Kaydet
                 </button>
             </div>
+            <!-- Çalıştır ve Temizle Butonları -->
+            <div class="btn-group shadow-sm ms-2">
+                <button id="runButton" class="btn btn-success btn-sm px-3" title="Çalıştır">
+                    <i class="fas fa-play me-1"></i> Çalıştır
+                </button>
+                <button id="clearButton" class="btn btn-outline-danger btn-sm" title="Temizle">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
             <div class="ms-3">
                 <button id="togglePreview" class="btn btn-outline-info btn-sm" title="Kod Önizleme (Alt+C)">
                     <i class="fas fa-code"></i>
@@ -52,14 +61,7 @@
         <div class="output-header d-flex justify-content-between align-items-center p-2 text-white border-bottom border-secondary"
             style="background: #1a1a2e;">
             <span class="fw-bold"><i class="fas fa-tv me-2 text-info"></i>Çıktı</span>
-            <div class="btn-group">
-                <button id="runButton" class="btn btn-success btn-sm">
-                    <i class="fas fa-play me-1"></i> Çalıştır
-                </button>
-                <button id="clearButton" class="btn btn-outline-danger btn-sm">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
+
         </div>
         <div class="output-body d-flex align-items-center justify-content-center p-3 flex-grow-1 overflow-auto bg-dark">
             <canvas id="outputCanvas" width="600" height="600" class="canvas-shadow"></canvas>
@@ -144,6 +146,9 @@
 
 <!-- JavaScript generators -->
 <script src="{% static 'js/block-generators.js' %}"></script>
+
+<!-- Utility scripts -->
+<script src="{% static 'js/utils/modal-utils.js' %}"></script>
 
 <!-- Main application scripts -->
 <script src="{% static 'js/blockly-config.js' %}"></script>

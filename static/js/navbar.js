@@ -209,15 +209,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // Basit bir toast/bildirim fonksiyonu (Eğer Bootstrap kullanılıyorsa modal yerine daha şık)
+    // Toast/bildirim fonksiyonu - Modern modal kullanıyor
     function showToast(title, message, type) {
-        // Şimdilik alert, ancak UI'a bir toast container eklenebilir
-        alert(title + ': ' + message);
+        // type: 'success' veya 'danger' -> modal tipleri: 'success' veya 'error'
+        const modalType = type === 'danger' ? 'error' : type;
+        showModal(title, message, modalType);
     }
 
     // Yeni dosya oluşturma
-    document.getElementById('newFile').addEventListener('click', function () {
-        if (confirm('Yeni bir proje oluşturmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacaktır.')) {
+    document.getElementById('newFile').addEventListener('click', async function () {
+        const confirmed = await showConfirmModal(
+            'Yeni Proje',
+            'Yeni bir proje oluşturmak istediğinizden emin misiniz? Kaydedilmemiş değişiklikler kaybolacaktır.',
+            'Evet, Oluştur',
+            'İptal'
+        );
+
+        if (confirmed) {
             Blockly.getMainWorkspace().clear();
             document.getElementById('projectName').value = 'isimsiz';
             window.currentProjectId = null; // ID'yi sıfırla

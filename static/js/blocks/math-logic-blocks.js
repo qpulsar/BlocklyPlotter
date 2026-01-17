@@ -1,6 +1,31 @@
 // Matematik ve mantık bloklarının tanımlamaları
+// NOT: math_add, math_subtract vb. bloklar geriye dönük uyumluluk için tutuluyor ancak toolbox'tan kaldırıldı.
+// Yerine aşağıdaki math_arithmetic bloğu kullanılıyor.
+
+Blockly.Blocks['math_arithmetic'] = {
+    init: function () {
+        this.appendValueInput("A")
+            .setCheck("Number");
+        this.appendDummyInput()
+            .appendField(new Blockly.FieldDropdown([
+                ["+", "ADD"],
+                ["-", "MINUS"],
+                ["×", "MULTIPLY"],
+                ["÷", "DIVIDE"],
+                ["^", "POWER"]
+            ]), "OP");
+        this.appendValueInput("B")
+            .setCheck("Number");
+        this.setInputsInline(true);
+        this.setOutput(true, "Number");
+        this.setColour(230);
+        this.setTooltip("İşlem seçerek iki sayıyı hesaplar");
+        this.setHelpUrl("");
+    }
+};
+
 Blockly.Blocks['math_add'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -14,7 +39,7 @@ Blockly.Blocks['math_add'] = {
 };
 
 Blockly.Blocks['math_multiply'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -28,7 +53,7 @@ Blockly.Blocks['math_multiply'] = {
 };
 
 Blockly.Blocks['math_subtract'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -42,7 +67,7 @@ Blockly.Blocks['math_subtract'] = {
 };
 
 Blockly.Blocks['math_divide'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -56,7 +81,7 @@ Blockly.Blocks['math_divide'] = {
 };
 
 Blockly.Blocks['random_int'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("rastgele sayı");
         this.setOutput(true, "Number");
@@ -65,7 +90,7 @@ Blockly.Blocks['random_int'] = {
 };
 
 Blockly.Blocks['comparison_block'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck(["Number", "String", "Boolean"]);
         this.appendDummyInput()
@@ -88,7 +113,7 @@ Blockly.Blocks['comparison_block'] = {
 };
 
 Blockly.Blocks['logic_and'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Boolean");
         this.appendValueInput("B")
@@ -102,7 +127,7 @@ Blockly.Blocks['logic_and'] = {
 };
 
 Blockly.Blocks['logic_or'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Boolean");
         this.appendValueInput("B")
@@ -116,7 +141,7 @@ Blockly.Blocks['logic_or'] = {
 };
 
 Blockly.Blocks['math_modulo'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("A")
             .setCheck("Number");
         this.appendValueInput("B")
@@ -130,7 +155,7 @@ Blockly.Blocks['math_modulo'] = {
 };
 
 Blockly.Blocks['math_round'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("NUM")
             .setCheck("Number")
             .appendField("yuvarla");
@@ -140,7 +165,7 @@ Blockly.Blocks['math_round'] = {
 };
 
 Blockly.Blocks['math_abs'] = {
-    init: function() {
+    init: function () {
         this.appendValueInput("NUM")
             .setCheck("Number")
             .appendField("mutlak");
@@ -150,7 +175,7 @@ Blockly.Blocks['math_abs'] = {
 };
 
 Blockly.Blocks['logic_null'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField("boş");
         this.setOutput(true, null);
@@ -161,7 +186,7 @@ Blockly.Blocks['logic_null'] = {
 };
 
 Blockly.Blocks['logic_boolean'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField(new Blockly.FieldDropdown([["doğru", "TRUE"], ["yanlış", "FALSE"]]), "BOOL");
         this.setOutput(true, "Boolean");
@@ -170,7 +195,7 @@ Blockly.Blocks['logic_boolean'] = {
 };
 
 Blockly.Blocks['math_number'] = {
-    init: function() {
+    init: function () {
         this.appendDummyInput()
             .appendField(new Blockly.FieldNumber(0), "NUM");
         this.setOutput(true, "Number");

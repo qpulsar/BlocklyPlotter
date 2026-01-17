@@ -983,6 +983,47 @@ Blockly.JavaScript.forBlock['current_second'] = function (block) {
     return ['currentSecond()', Blockly.JavaScript.ORDER_FUNCTION_CALL];
 };
 
+Blockly.JavaScript.forBlock['math_arithmetic'] = function (block) {
+    var operator = block.getFieldValue('OP');
+    var order = Blockly.JavaScript.ORDER_NONE;
+    var operatorSymbol = '';
+
+    switch (operator) {
+        case 'ADD':
+            operatorSymbol = ' + ';
+            order = Blockly.JavaScript.ORDER_ADDITION;
+            break;
+        case 'MINUS':
+            operatorSymbol = ' - ';
+            order = Blockly.JavaScript.ORDER_SUBTRACTION;
+            break;
+        case 'MULTIPLY':
+            operatorSymbol = ' * ';
+            order = Blockly.JavaScript.ORDER_MULTIPLICATION;
+            break;
+        case 'DIVIDE':
+            operatorSymbol = ' / ';
+            order = Blockly.JavaScript.ORDER_DIVISION;
+            break;
+        case 'POWER':
+            operatorSymbol = null;
+            order = Blockly.JavaScript.ORDER_FUNCTION_CALL; // Math.pow
+            break;
+    }
+
+    var argument0 = Blockly.JavaScript.valueToCode(block, 'A', order) || '0';
+    var argument1 = Blockly.JavaScript.valueToCode(block, 'B', order) || '0';
+
+    var code;
+    if (!operatorSymbol) { // Power (Math.pow)
+        code = 'Math.pow(' + argument0 + ', ' + argument1 + ')';
+        return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+    }
+
+    code = argument0 + operatorSymbol + argument1;
+    return [code, order];
+};
+
 Blockly.JavaScript.forBlock['math_add'] = function (block) {
     var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_NONE) || '0';
     var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_NONE) || '0';

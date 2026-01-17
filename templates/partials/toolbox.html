@@ -332,10 +332,21 @@
         <block type="math_number">
             <field name="NUM">0</field>
         </block>
-        <block type="math_add"></block>
-        <block type="math_subtract"></block>
-        <block type="math_multiply"></block>
-        <block type="math_divide"></block>
+
+        <!-- Yeni Birleşik Aritmetik Bloğu -->
+        <block type="math_arithmetic">
+            <value name="A">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="B">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+
         <block type="math_modulo"></block>
 
         <!-- Yuvarlama -->
